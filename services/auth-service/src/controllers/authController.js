@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const AuthUser = require('../models/userModel');
+const { Op } = require('sequelize');
 
 exports.register = async (req, res) => {
     try {
@@ -78,6 +79,47 @@ exports.login = async (req, res) => {
                 role: user.role,
                 first_name: user.first_name,
                 last_name: user.last_name
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+exports.getUsers = async (req, res) => {
+    try {
+        const { page = 1, limit = 10, search = '', role = '' } = req.query;
+        const offset = (page - 1) * limit;
+
+        const whereClause = {};
+
+        if (search) {
+            whereClause[Op.or] = [
+                { first_name: { [Op.like]: `%${search}%` } },
+                { last_name: { [Op.like]: `%${search}%` } },
+                { email: { [Op.like]: `%${search}%` } }
+            ];
+        }
+
+        if (role) {
+            whereClause.role = role;
+        }
+
+        const { count, rows } = await AuthUser.findAndCountAll({
+            where: whereClause,
+            attributes: { exclude: ['password_hash'] },
+            limit: parseInt(limit),
+            offset: parseInt(offset),
+            order: [['created_at', 'DESC']]
+        });
+
+        res.status(200).json({
+            users: rows,
+            pagination: {
+                total: count,
+                page: parseInt(page),
+                limit: parseInt(limit),
+                totalPages: Math.ceil(count / limit)
             }
         });
     } catch (error) {

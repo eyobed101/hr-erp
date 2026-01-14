@@ -29,6 +29,9 @@ const UserManagement = () => {
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [totalUsers, setTotalUsers] = useState(0);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [roleFilter, setRoleFilter] = useState('');
     const [openModal, setOpenModal] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -43,16 +46,22 @@ const UserManagement = () => {
 
     useEffect(() => {
         fetchUsers();
-    }, []);
+    }, [page, rowsPerPage, searchQuery, roleFilter]);
 
     const fetchUsers = async () => {
         try {
             setLoading(true);
-            // Note: You'll need to implement a getUsers endpoint in your auth service
-            // For now, this is a placeholder
-            setUsers([]);
+            const response = await authAPI.getUsers({
+                page: page + 1,
+                limit: rowsPerPage,
+                search: searchQuery,
+                role: roleFilter,
+            });
+            setUsers(response.data.users);
+            setTotalUsers(response.data.pagination.total);
         } catch (err) {
             setError('Failed to fetch users');
+            console.error(err);
         } finally {
             setLoading(false);
         }
@@ -141,6 +150,47 @@ const UserManagement = () => {
                 </Button>
             </div>
 
+            <Paper elevation={0} sx={{ border: '1px solid #e5e7eb', borderRadius: 2, mb: 2, p: 2 }}>
+                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                    <TextField
+                        size="small"
+                        placeholder="Search by name or email..."
+                        value={searchQuery}
+                        onChange={(e) => {
+                            setSearchQuery(e.target.value);
+                            setPage(0);
+                        }}
+                        sx={{ flexGrow: 1 }}
+                        InputProps={{
+                            startAdornment: (
+                                <Box sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
+                                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </Box>
+                            ),
+                        }}
+                    />
+                    <TextField
+                        select
+                        size="small"
+                        label="Filter by Role"
+                        value={roleFilter}
+                        onChange={(e) => {
+                            setRoleFilter(e.target.value);
+                            setPage(0);
+                        }}
+                        sx={{ minWidth: 150 }}
+                    >
+                        <MenuItem value="">All Roles</MenuItem>
+                        <MenuItem value="admin">Admin</MenuItem>
+                        <MenuItem value="hr">HR</MenuItem>
+                        <MenuItem value="manager">Manager</MenuItem>
+                        <MenuItem value="employee">Employee</MenuItem>
+                    </TextField>
+                </Box>
+            </Paper>
+
             <Paper elevation={0} sx={{ border: '1px solid #e5e7eb', borderRadius: 2 }}>
                 <TableContainer>
                     <Table>
@@ -169,7 +219,6 @@ const UserManagement = () => {
                                 </TableRow>
                             ) : (
                                 users
-                                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                     .map((user) => (
                                         <TableRow key={user.id} hover>
                                             <TableCell>
@@ -207,9 +256,9 @@ const UserManagement = () => {
                     </Table>
                 </TableContainer>
                 <TablePagination
-                    rowsPerPageOptions={[5, 10, 25]}
+                    rowsPerPageOptions={[5, 10, 25, 50]}
                     component="div"
-                    count={users.length}
+                    count={totalUsers}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}
