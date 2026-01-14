@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+jspm_packages/
+
+# Debugging
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs
+*.log
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Planning & Brain (Antigravity artifacts if moved to project)
+brain/
+implementation_plan.md
+walkthrough.md
+task.md
+
+# Testing
+coverage/
+.nyc_output
+
+# Miscellaneous
+*.txt
+*.pdf
+temp/
+tmp/
