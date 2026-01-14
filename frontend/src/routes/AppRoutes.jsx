@@ -8,6 +8,7 @@ import RoleBasedRoute from './RoleBasedRoute';
 import MainLayout from '../components/layout/MainLayout';
 
 import Login from '../pages/common/Login';
+import JobBoard from '../pages/common/JobBoard';
 import NotFound from '../pages/common/NotFound';
 import Unauthorized from '../pages/common/Unauthorized';
 
@@ -43,6 +44,7 @@ const AppRoutes = () => {
     return (
         <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/jobs" element={<JobBoard />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
 
             <Route path="/" element={<Navigate to={getDefaultRoute()} replace />} />

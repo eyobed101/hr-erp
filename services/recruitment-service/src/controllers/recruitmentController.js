@@ -3,7 +3,12 @@ const { Job, Application } = require('../models');
 // Job Controllers
 exports.createJob = async (req, res) => {
     try {
-        const job = await Job.create(req.body);
+        const data = { ...req.body };
+        // Sanitize empty strings to null for optional fields
+        Object.keys(data).forEach(key => {
+            if (data[key] === '') data[key] = null;
+        });
+        const job = await Job.create(data);
         res.status(201).json(job);
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -37,7 +42,13 @@ exports.updateJob = async (req, res) => {
     try {
         const job = await Job.findByPk(req.params.id);
         if (!job) return res.status(404).json({ message: 'Job not found' });
-        await job.update(req.body);
+
+        const data = { ...req.body };
+        Object.keys(data).forEach(key => {
+            if (data[key] === '') data[key] = null;
+        });
+
+        await job.update(data);
         res.json(job);
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -58,7 +69,11 @@ exports.deleteJob = async (req, res) => {
 // Application Controllers
 exports.applyForJob = async (req, res) => {
     try {
-        const application = await Application.create(req.body);
+        const data = { ...req.body };
+        Object.keys(data).forEach(key => {
+            if (data[key] === '') data[key] = null;
+        });
+        const application = await Application.create(data);
         res.status(201).json(application);
     } catch (error) {
         res.status(400).json({ message: error.message });
