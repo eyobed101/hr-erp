@@ -7,7 +7,7 @@ const Attendance = () => {
     <div className="p-6 space-y-6">
       <h1 className="text-3xl font-bold">Attendance</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <AttendanceForm />
+        <AttendanceForm profile={{ id: 106, name: "Abe" }} />
         <AttendanceFilter />
       </div>
 

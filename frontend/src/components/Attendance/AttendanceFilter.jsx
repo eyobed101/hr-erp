@@ -1,60 +1,58 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import AttendanceFilter from "./AttendanceFilter";
 
-export default function AttendanceFilter({ onFilter }) {
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [employeeId, setEmployeeId] = useState('');
+const api = axios.create({
+  baseURL: "http://localhost:3004/api",
+});
 
-  const handleFilter = () => {
-    // Pass filter values back to parent
-    onFilter({ startDate, endDate, employeeId });
+export default function AttendanceList() {
+  const [attendances, setAttendances] = useState([]);
+
+  const fetchFilteredAttendance = async ({ startDate, endDate, employeeId }) => {
+    try {
+      const res = await api.get("/attendance/filter", {
+        params: { startDate, endDate, employeeId },
+      });
+      setAttendances(res.data);
+    } catch (err) {
+      console.error("Error fetching filtered attendance:", err);
+    }
   };
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-4 space-y-4">
-      <h2 className="text-lg font-bold text-gray-700">Filter Attendance</h2>
+    <div className="space-y-6">
+      {/* Filter Component */}
+      <AttendanceFilter onFilter={fetchFilteredAttendance} />
 
-      {/* Start Date Filter */}
-      <div>
-        <label className="block text-sm font-medium text-gray-600">Start Date</label>
-        <input
-          type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-300"
-        />
+      {/* Attendance Table */}
+      <div className="bg-white shadow-md rounded-lg p-4">
+        <h2 className="text-lg font-bold text-gray-700 mb-2">Attendance Records</h2>
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border px-2 py-1">ID</th>
+              <th className="border px-2 py-1">Employee ID</th>
+              <th className="border px-2 py-1">Date</th>
+              <th className="border px-2 py-1">Clock In</th>
+              <th className="border px-2 py-1">Clock Out</th>
+              <th className="border px-2 py-1">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {attendances.map((att) => (
+              <tr key={att.id}>
+                <td className="border px-2 py-1">{att.id}</td>
+                <td className="border px-2 py-1">{att.employee_id}</td>
+                <td className="border px-2 py-1">{att.clock_date}</td>
+                <td className="border px-2 py-1">{att.clock_in ? new Date(att.clock_in).toLocaleTimeString() : "-"}</td>
+                <td className="border px-2 py-1">{att.clock_out ? new Date(att.clock_out).toLocaleTimeString() : "-"}</td>
+                <td className="border px-2 py-1">{att.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
-
-      {/* End Date Filter */}
-      <div>
-        <label className="block text-sm font-medium text-gray-600">End Date</label>
-        <input
-          type="date"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-          className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-300"
-        />
-      </div>
-
-      {/* Employee Filter */}
-      <div>
-        <label className="block text-sm font-medium text-gray-600">Employee ID</label>
-        <input
-          type="text"
-          value={employeeId}
-          onChange={(e) => setEmployeeId(e.target.value)}
-          placeholder="Enter employee ID"
-          className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-300"
-        />
-      </div>
-
-      {/* Filter Button */}
-      <button
-        onClick={handleFilter}
-        className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
-      >
-        Apply Filter
-      </button>
     </div>
   );
 }

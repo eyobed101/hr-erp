@@ -71,7 +71,7 @@ const AppRoutes = () => {
                 <Route path="/employee/dashboard" element={<RoleBasedRoute allowedRoles={[ROLES.EMPLOYEE]}><EmployeeDashboard /></RoleBasedRoute>} />
                 <Route path="/employee/profile" element={<RoleBasedRoute allowedRoles={[ROLES.EMPLOYEE]}><Profile /></RoleBasedRoute>} />
                 <Route path="/employee/leave" element={<RoleBasedRoute allowedRoles={[ROLES.EMPLOYEE]}><LeaveRequest /></RoleBasedRoute>} />
-                <Route path="/employee/attendance" element={<RoleBasedRoute allowedRoles={[ROLES.EMPLOYEE]}><Attendance /></RoleBasedRoute>} />
+                <Route path="/employee/attendance" element={<Attendance />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
