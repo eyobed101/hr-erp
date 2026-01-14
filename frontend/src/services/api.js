@@ -55,9 +55,10 @@ const trainingService = createServiceInstance('training');
 const benefitsService = createServiceInstance('benefits');
 
 export const authAPI = {
-    login: (credentials) => authService.post('auth/login', credentials),
-    register: (userData) => authService.post('auth/register', userData),
-    validateToken: () => authService.post('auth/validate'),
+    login: (credentials) => authService.post('/auth/login', credentials),
+    register: (userData) => authService.post('/auth/register', userData),
+    validateToken: () => authService.post('/auth/validate'),
+    getUsers: (params) => authService.get('/auth/users', { params }),
 };
 
 export const profileAPI = {
