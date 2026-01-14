@@ -1,18 +1,16 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Login from './pages/Login';
-import Dashboard from './components/Dashboard';
+import { BrowserRouter } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { store } from './app/store';
+import AppRoutes from './routes/AppRoutes';
+import './index.css';
 
 function App() {
     return (
-        <Router>
-            <div className="App">
-                <Routes>
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/" element={<Dashboard />} />
-                </Routes>
-            </div>
-        </Router>
+        <Provider store={store}>
+            <BrowserRouter>
+                <AppRoutes />
+            </BrowserRouter>
+        </Provider>
     );
 }
 

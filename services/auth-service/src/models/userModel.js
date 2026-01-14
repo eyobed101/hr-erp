@@ -43,7 +43,7 @@ const AuthUser = sequelize.define('AuthUser', {
 }, {
     tableName: 'auth_users',
     timestamps: true,
-    paranoid: true, // Soft deletes (deleted_at)
+    paranoid: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
     deletedAt: 'deleted_at',
