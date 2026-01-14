@@ -1,18 +1,22 @@
-const express = require('express');
-const app = express();
-const employeeRoutes = require('./src/routes/employeeRoutes');
-require('dotenv').config();
+// server.js
+import dotenv from 'dotenv';
+dotenv.config();
 
-const PORT = process.env.PORT || 3001;
+import app from './app.js';
+import sequelize from './src/config/db.js'; // <-- adjust path to src/config
 
-app.use(express.json());
+const PORT = process.env.PORT || 5002;
 
-app.use('/api/employee', employeeRoutes);
+(async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('Employee DB connected');
 
-app.get('/', (req, res) => {
-  res.send('employee-service is running');
-});
-
-app.listen(PORT, () => {
-  console.log(`employee-service running on port ${PORT}`);
-});
+    await sequelize.sync();
+    app.listen(PORT, () =>
+      console.log(`Employee Service running on port ${PORT}`)
+    );
+  } catch (err) {
+    console.error('Unable to start server:', err);
+  }
+})();
