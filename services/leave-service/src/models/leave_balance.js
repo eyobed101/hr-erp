@@ -8,7 +8,6 @@
 //     created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
 //     updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 //     UNIQUE KEY uk_leave_year_type (employee_id, leave_type, year),
-//     FOREIGN KEY (employee_id) REFERENCES emp_employees(id)
 // );
 //
 

@@ -10,8 +10,6 @@
 ///     approver_id     INT,                               -- manager or HR
 ///     created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
 ///     updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-///     FOREIGN KEY (employee_id) REFERENCES emp_employees(id),
-///     FOREIGN KEY (approver_id) REFERENCES emp_employees(id)
 /// );
 
 import { DataTypes } from "sequelize";
