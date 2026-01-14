@@ -1,22 +1,44 @@
-// server.js
-import dotenv from 'dotenv';
-dotenv.config();
+// api-gateway/server.js
+import express from 'express';
+import cors from 'cors';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 
-import app from './app.js';
-import sequelize from './src/config/db.js'; // <-- adjust path to src/config
+const app = express();
+const PORT = 5000; // API Gateway runs on 5000
 
-const PORT = process.env.PORT || 5002;
+app.use(cors());
+app.use(express.json());
 
-(async () => {
-  try {
-    await sequelize.authenticate();
-    console.log('Employee DB connected');
+// ====================
+// Proxy rules
+// ====================
 
-    await sequelize.sync();
-    app.listen(PORT, () =>
-      console.log(`Employee Service running on port ${PORT}`)
-    );
-  } catch (err) {
-    console.error('Unable to start server:', err);
-  }
-})();
+// Employee Service
+app.use(
+  '/employees',
+  createProxyMiddleware({
+    target: 'http://localhost:5002', // Employee service
+    changeOrigin: true,
+    pathRewrite: { '^/employees': '/api/employees' }, // maps /employees → /api/employees
+  })
+);
+
+// Auth Service (example)
+app.use(
+  '/auth',
+  createProxyMiddleware({
+    target: 'http://localhost:5001', // Auth service port
+    changeOrigin: true,
+    pathRewrite: { '^/auth': '/api/auth' },
+  })
+);
+
+// Root test
+app.get('/', (req, res) => {
+  res.send('API Gateway is running');
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`API Gateway running on http://localhost:${PORT}`);
+});
