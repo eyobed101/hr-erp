@@ -91,7 +91,7 @@ const JobBoard = () => {
                                             <span className="text-xs text-gray-400 font-medium italic">Posted: {job.posted_date}</span>
                                         </div>
                                         <h3 className="text-2xl font-bold text-gray-800 group-hover:text-blue-600 transition-colors">{job.title}</h3>
-                                        <div className="flex items-center gap-4 text-sm text-gray-500 font-medium">
+                                        <div className="flex items-center gap-4 text-sm text-gray-500 font-medium pb-2">
                                             <span className="flex items-center gap-1">
                                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-10V4a1 1 0 011-1h2a1 1 0 011 1v3M12 7h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -106,6 +106,11 @@ const JobBoard = () => {
                                                 Remote
                                             </span>
                                         </div>
+                                        {job.description && (
+                                            <p className="text-gray-600 text-sm line-clamp-3 leading-relaxed max-w-2xl">
+                                                {job.description}
+                                            </p>
+                                        )}
                                     </div>
                                     <button
                                         onClick={() => { setSelectedJob(job); setIsApplyModalOpen(true); }}

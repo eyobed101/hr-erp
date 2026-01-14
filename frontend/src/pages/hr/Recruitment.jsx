@@ -100,8 +100,8 @@ const Recruitment = () => {
                 <button
                     onClick={() => setActiveTab('jobs')}
                     className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'jobs'
-                            ? 'bg-white text-blue-600 shadow-sm'
-                            : 'text-gray-500 hover:text-gray-700'
+                        ? 'bg-white text-blue-600 shadow-sm'
+                        : 'text-gray-500 hover:text-gray-700'
                         }`}
                 >
                     Job Postings ({jobs.length})
@@ -109,8 +109,8 @@ const Recruitment = () => {
                 <button
                     onClick={() => setActiveTab('apps')}
                     className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'apps'
-                            ? 'bg-white text-blue-600 shadow-sm'
-                            : 'text-gray-500 hover:text-gray-700'
+                        ? 'bg-white text-blue-600 shadow-sm'
+                        : 'text-gray-500 hover:text-gray-700'
                         }`}
                 >
                     Applications ({applications.length})
@@ -157,6 +157,11 @@ const Recruitment = () => {
                                     <p>Posted: {job.posted_date || 'N/A'}</p>
                                     <p>Closing: {job.closing_date || 'N/A'}</p>
                                 </div>
+                                {job.description && (
+                                    <p className="text-sm text-gray-600 line-clamp-2 italic">
+                                        {job.description}
+                                    </p>
+                                )}
                                 <div className="pt-4 flex items-center justify-between text-xs text-gray-400 border-t border-gray-50">
                                     <span className="font-bold text-gray-600 uppercase tracking-widest">{job.applications?.length || 0} Applicants</span>
                                 </div>
@@ -187,8 +192,8 @@ const Recruitment = () => {
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest capitalize ${app.stage === 'hired' ? 'bg-green-100 text-green-700' :
-                                                app.stage === 'rejected' ? 'bg-red-100 text-red-700' :
-                                                    'bg-blue-100 text-blue-700'
+                                            app.stage === 'rejected' ? 'bg-red-100 text-red-700' :
+                                                'bg-blue-100 text-blue-700'
                                             }`}>
                                             {app.stage}
                                         </span>
@@ -206,7 +211,8 @@ const Recruitment = () => {
                         </tbody>
                     </table>
                 </div>
-            )}
+            )
+            }
 
             <JobModal
                 isOpen={isJobModalOpen}
@@ -221,7 +227,7 @@ const Recruitment = () => {
                 application={selectedApp}
                 onUpdateStage={handleUpdateAppStage}
             />
-        </div>
+        </div >
     );
 };
 

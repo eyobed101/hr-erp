@@ -6,7 +6,8 @@ const JobModal = ({ isOpen, onClose, onSave, job }) => {
         status: 'open',
         posted_date: '',
         closing_date: '',
-        department_id: '' // Kept if needed, though usually department info might come from elsewhere
+        department_id: '',
+        description: ''
     });
 
     useEffect(() => {
@@ -16,7 +17,8 @@ const JobModal = ({ isOpen, onClose, onSave, job }) => {
                 status: job.status || 'open',
                 posted_date: job.posted_date || '',
                 closing_date: job.closing_date || '',
-                department_id: job.department_id || ''
+                department_id: job.department_id || '',
+                description: job.description || ''
             });
         } else {
             setFormData({
@@ -24,7 +26,8 @@ const JobModal = ({ isOpen, onClose, onSave, job }) => {
                 status: 'open',
                 posted_date: new Date().toISOString().split('T')[0],
                 closing_date: '',
-                department_id: ''
+                department_id: '',
+                description: ''
             });
         }
     }, [job, isOpen]);
@@ -107,6 +110,18 @@ const JobModal = ({ isOpen, onClose, onSave, job }) => {
                             <option value="on_hold">On Hold</option>
                             <option value="filled">Filled</option>
                         </select>
+                    </div>
+
+                    <div className="space-y-1">
+                        <label className="text-sm font-semibold text-gray-700">Job Description</label>
+                        <textarea
+                            name="description"
+                            value={formData.description}
+                            onChange={handleChange}
+                            rows="4"
+                            className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            placeholder="Describe the job responsibilities, requirements, etc."
+                        ></textarea>
                     </div>
 
                     <div className="pt-4 flex justify-end space-x-3">

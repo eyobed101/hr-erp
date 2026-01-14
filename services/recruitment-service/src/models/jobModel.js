@@ -26,6 +26,10 @@ const Job = sequelize.define('Job', {
     closing_date: {
         type: DataTypes.DATEONLY,
         allowNull: true
+    },
+    description: {
+        type: DataTypes.TEXT,
+        allowNull: true
     }
 }, {
     tableName: 'jobs',
