@@ -1,18 +1,14 @@
 const express = require('express');
+const cors =require("cors")
 const app = express();
-const attendanceRoutes = require('./src/routes/attendanceRoutes');
-require('dotenv').config();
-
-const PORT = process.env.PORT || 3001;
+const attendanceRoutes = require('./src/routes/attendanceRoutes.js');
 
 app.use(express.json());
+app.use(cors())
 
 app.use('/api/attendance', attendanceRoutes);
 
-app.get('/', (req, res) => {
-  res.send('attendance-service is running');
-});
-
+const PORT = process.env.PORT || 3004;
 app.listen(PORT, () => {
-  console.log(`attendance-service running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
