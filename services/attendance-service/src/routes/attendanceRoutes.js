@@ -10,5 +10,5 @@ router.get('/', attendanceController.getAttendance)
 
 router.get('/employee/:employee_id', attendanceController.getAttendanceByEmployee);
 router.delete("/:id", attendanceController.deleteAttendance);
-router.get('/filtered', attendanceController.getAttendanceFiltered);
+router.get('/filter', attendanceController.getAttendanceFiltered);
 module.exports = router;

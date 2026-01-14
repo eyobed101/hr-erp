@@ -79,21 +79,39 @@ const getAttendanceByEmployee = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 const getTodayAttendance = async (req, res) => {
   try {
-    const today = new Date().toISOString().split('T')[0];
-
+    const today = new Date().toISOString().split("T")[0];
     const records = await Attendance.findAll({
       where: { clock_date: today },
-      order: [['clock_in', 'ASC']]
     });
 
-    res.json(records);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: error.message });
+    const updatedRecords = await Promise.all(
+      records.map(async (att) => {
+        if (att.clock_in && !att.clock_out) {
+          const clockInTime = new Date(att.clock_in);
+          const workedHours = (new Date() - clockInTime) / 1000 / 60 / 60; // hours
+
+          if (workedHours >= 8 && att.status !== "present") {
+            att.status = "present";
+            await att.save();
+          } else if (workedHours < 8 && att.status !== "late") {
+            att.status = "late";
+            await att.save();
+          }
+        }
+        return att;
+      })
+    );
+
+    res.json(updatedRecords);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
   }
 };
+
 const getAttendance = async (req, res) => {
   try {
     const records = await Attendance.findAll({

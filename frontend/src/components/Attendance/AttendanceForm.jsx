@@ -5,7 +5,7 @@ const api = axios.create({
   baseURL: "http://localhost:3004/api",
 });
 
-export default function AttendanceForm({ profile={id:10} }) {
+export default function AttendanceForm({ profile = { id: 10 } }) {
   const [attendance, setAttendance] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -14,16 +14,16 @@ export default function AttendanceForm({ profile={id:10} }) {
 
   const getTodayDate = () => new Date().toISOString().split("T")[0];
   const fetchTodayAttendance = async () => {
-      try {
-        const res = await api.get(`attendance/employee/${profile.id}`);
-        if (res.data.length > 0) {
-          setAttendance(res.data[0]); 
-        }
-        console.log("Fetched attendance:", res.data);
-      } catch (err) {
-        console.error("Fetch attendance error:", err);
+    try {
+      const res = await api.get(`attendance/employee/${profile.id}`);
+      if (res.data.length > 0) {
+        setAttendance(res.data[0]);
       }
-    };
+      console.log("Fetched attendance:", res.data);
+    } catch (err) {
+      console.error("Fetch attendance error:", err);
+    }
+  };
   useEffect(() => {
     fetchTodayAttendance();
   }, [profile]);
@@ -60,49 +60,50 @@ export default function AttendanceForm({ profile={id:10} }) {
   };
 
   // Clock Out
- const handleClockOut = async () => {
-  if (loading || !attendance?.clock_in || attendance?.clock_out) return;
+  const handleClockOut = async () => {
+    if (loading || !attendance?.clock_in || attendance?.clock_out) return;
 
-  setLoading(true);
-  try {
-    const now = new Date();
-    const nowISO = now.toISOString();
+    setLoading(true);
+    try {
+      const now = new Date();
+      const nowISO = now.toISOString();
 
-    const clockInTime = new Date(attendance.clock_in);
-    const workedMilliseconds = now - clockInTime;
-    const workedHours = workedMilliseconds / (1000 * 60 * 60); // convert ms to hours
+      const clockInTime = new Date(attendance.clock_in);
+      const workedMilliseconds = now - clockInTime;
+      const workedHours = workedMilliseconds / (1000 * 60 * 60); // convert ms to hours
 
-   
-    let updatedStatus = attendance.status; 
-    if (workedHours < 8) {
-      updatedStatus = "late";
+      let updatedStatus = attendance.status;
+      if (workedHours < 8) {
+        updatedStatus = "late";
+      }
+
+      const payload = {
+        employee_id: profile.id,
+        clock_date: getTodayDate(),
+        clock_out: nowISO,
+        status: updatedStatus,
+      };
+
+      const res = await api.put(
+        `/attendance/clockout/${attendance.id}`,
+        payload
+      );
+
+      setAttendance((prev) => ({
+        ...prev,
+        clock_out: nowISO,
+        status: updatedStatus,
+      }));
+    } catch (err) {
+      console.error("Clock-out error:", err.response?.data || err.message);
+      alert("Failed to clock out. Please try again.");
+    } finally {
+      setLoading(false);
     }
-
-    const payload = {
-      employee_id: profile.id,
-      clock_date: getTodayDate(),
-      clock_out: nowISO,
-      status: updatedStatus, 
-    };
-
-    const res = await api.put(`/attendance/clockout/${attendance.id}`, payload);
-
-    setAttendance((prev) => ({
-      ...prev,
-      clock_out: nowISO,
-      status: updatedStatus,
-    }));
-  } catch (err) {
-    console.error("Clock-out error:", err.response?.data || err.message);
-    alert("Failed to clock out. Please try again.");
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   return (
-    <div className="w-[500px] mx-auto bg-white shadow-md rounded-lg p-6 space-y-4">
+    <div className="w-full  mx-auto bg-white shadow-md rounded-lg p-6 space-y-4">
       <h2 className="text-xl font-bold text-gray-700">Attendance Form</h2>
       <div className="flex justify-between text-sm text-gray-600">
         <span>Shift Start: {shiftStart}</span>
@@ -134,10 +135,16 @@ export default function AttendanceForm({ profile={id:10} }) {
       </div>
       <div className="text-center">
         <p className="text-gray-700">
-          Clock In: {attendance?.clock_in ? new Date(attendance.clock_in).toLocaleTimeString() : "-"}
+          Clock In:{" "}
+          {attendance?.clock_in
+            ? new Date(attendance.clock_in).toLocaleTimeString()
+            : "-"}
         </p>
         <p className="text-gray-700">
-          Clock Out: {attendance?.clock_out ? new Date(attendance.clock_out).toLocaleTimeString() : "-"}
+          Clock Out:{" "}
+          {attendance?.clock_out
+            ? new Date(attendance.clock_out).toLocaleTimeString()
+            : "-"}
         </p>
         <p
           className={`font-semibold mt-2 ${
