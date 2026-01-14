@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { selectCurrentRole, logout } from '../../features/auth/authSlice';
 import { NAVIGATION_CONFIG } from '../../utils/roleConfig';
 
-const Sidebar = () => {
+const Sidebar = ({ isMobileOpen, onMobileClose }) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const role = useSelector(selectCurrentRole);
     const dispatch = useDispatch();
@@ -18,6 +18,12 @@ const Sidebar = () => {
     };
 
     const isActive = (path) => location.pathname === path;
+
+    const handleNavClick = () => {
+        if (onMobileClose) {
+            onMobileClose();
+        }
+    };
 
     const getIcon = (iconName) => {
         const icons = {
@@ -59,136 +65,146 @@ const Sidebar = () => {
     };
 
     return (
-        <div
-            className={`${isCollapsed ? 'w-16' : 'w-64'
-                } bg-white border-r border-gray-200 min-h-screen flex flex-col transition-all duration-300 ease-in-out`}
-        >
-            {/* Header */}
-            <div className="h-16 border-b border-gray-200 flex items-center justify-between px-4">
-                {!isCollapsed && (
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
-                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                            </svg>
-                        </div>
-                        <div className="flex flex-col">
-                            <span className="text-sm font-bold text-gray-900">HR ERP</span>
-                            <span className="text-xs text-gray-500 capitalize">{role}</span>
-                        </div>
-                    </div>
-                )}
-                <button
-                    onClick={() => setIsCollapsed(!isCollapsed)}
-                    className="p-1.5 hover:bg-gray-100 rounded-md transition-colors"
-                    aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-                >
-                    <svg
-                        className={`w-4 h-4 text-gray-600 transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                </button>
-            </div>
+        <>
+            {/* Mobile Overlay */}
+            {isMobileOpen && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+                    onClick={onMobileClose}
+                />
+            )}
 
-            {/* Navigation */}
-            <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-                {!isCollapsed && (
-                    <div className="px-3 mb-2">
-                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Menu</p>
-                    </div>
-                )}
-
-                {navItems.map((item) => {
-                    const active = isActive(item.path);
-                    return (
-                        <Link
-                            key={item.path}
-                            to={item.path}
-                            className={`
-                group relative flex items-center gap-3 px-3 py-2.5 rounded-lg
-                transition-all duration-200 ease-in-out
-                ${active
-                                    ? 'bg-gradient-to-r from-blue-50 to-purple-50 text-blue-600 shadow-sm'
-                                    : 'text-gray-700 hover:bg-gray-50'
-                                }
-                ${isCollapsed ? 'justify-center' : ''}
-              `}
-                            title={isCollapsed ? item.label : ''}
-                        >
-                            {/* Active indicator */}
-                            {active && (
-                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-blue-600 to-purple-600 rounded-r-full" />
-                            )}
-
-                            {/* Icon */}
-                            <svg
-                                className={`
-                  w-5 h-5 flex-shrink-0 transition-colors duration-200
-                  ${active ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'}
-                `}
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                {getIcon(item.icon)}
-                            </svg>
-
-                            {/* Label */}
-                            {!isCollapsed && (
-                                <span className={`
-                  text-sm font-medium transition-colors duration-200
-                  ${active ? 'text-blue-600' : 'text-gray-700 group-hover:text-gray-900'}
-                `}>
-                                    {item.label}
-                                </span>
-                            )}
-
-                            {/* Tooltip for collapsed state */}
-                            {isCollapsed && (
-                                <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
-                                    {item.label}
-                                </div>
-                            )}
-                        </Link>
-                    );
-                })}
-            </nav>
-
-            {/* Footer */}
-            <div className="p-3 border-t border-gray-200">
-                {!isCollapsed && (
-                    <div className="px-3 mb-2">
-                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Other</p>
-                    </div>
-                )}
-
-                <button
-                    onClick={handleLogout}
-                    className={`
-            group w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
-            text-gray-700 hover:bg-red-50 hover:text-red-600
-            transition-all duration-200 ease-in-out
-            ${isCollapsed ? 'justify-center' : ''}
-          `}
-                    title={isCollapsed ? 'Logout' : ''}
-                >
-                    <svg className="w-5 h-5 text-gray-400 group-hover:text-red-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    {!isCollapsed && <span className="text-sm font-medium">Logout</span>}
-
-                    {isCollapsed && (
-                        <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
-                            Logout
+            {/* Sidebar */}
+            <div
+                className={`${isCollapsed ? 'w-16' : 'w-64'
+                    } bg-white border-r border-gray-200 min-h-screen flex flex-col transition-all duration-300 ease-in-out
+        fixed lg:static inset-y-0 left-0 z-50 transform ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'
+                    } lg:translate-x-0`}
+            >
+                {/* Header */}
+                <div className="h-16 border-b border-gray-200 flex items-center justify-between px-4">
+                    {!isCollapsed && (
+                        <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
+                                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-sm font-bold text-gray-900">HR ERP</span>
+                                <span className="text-xs text-gray-500 capitalize">{role}</span>
+                            </div>
                         </div>
                     )}
-                </button>
+                    <button
+                        onClick={() => setIsCollapsed(!isCollapsed)}
+                        className="p-1.5 hover:bg-gray-100 rounded-md transition-colors hidden lg:block"
+                        aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                    >
+                        <svg
+                            className={`w-4 h-4 text-gray-600 transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                </div>
+
+                {/* Navigation */}
+                <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+                    {!isCollapsed && (
+                        <div className="px-3 mb-2">
+                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Menu</p>
+                        </div>
+                    )}
+
+                    {navItems.map((item) => {
+                        const active = isActive(item.path);
+                        return (
+                            <Link
+                                key={item.path}
+                                to={item.path}
+                                onClick={handleNavClick}
+                                className={`
+                  group relative flex items-center gap-3 px-3 py-2.5 rounded-lg
+                  transition-all duration-200 ease-in-out
+                  ${active
+                                        ? 'bg-gradient-to-r from-blue-50 to-purple-50 text-blue-600 shadow-sm'
+                                        : 'text-gray-700 hover:bg-gray-50'
+                                    }
+                  ${isCollapsed ? 'justify-center' : ''}
+                `}
+                                title={isCollapsed ? item.label : ''}
+                            >
+                                {active && (
+                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-blue-600 to-purple-600 rounded-r-full" />
+                                )}
+
+                                <svg
+                                    className={`
+                    w-5 h-5 flex-shrink-0 transition-colors duration-200
+                    ${active ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'}
+                  `}
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    {getIcon(item.icon)}
+                                </svg>
+
+                                {!isCollapsed && (
+                                    <span className={`
+                    text-sm font-medium transition-colors duration-200
+                    ${active ? 'text-blue-600' : 'text-gray-700 group-hover:text-gray-900'}
+                  `}>
+                                        {item.label}
+                                    </span>
+                                )}
+
+                                {isCollapsed && (
+                                    <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
+                                        {item.label}
+                                    </div>
+                                )}
+                            </Link>
+                        );
+                    })}
+                </nav>
+
+                {/* Footer */}
+                <div className="p-3 border-t border-gray-200">
+                    {!isCollapsed && (
+                        <div className="px-3 mb-2">
+                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Other</p>
+                        </div>
+                    )}
+
+                    <button
+                        onClick={handleLogout}
+                        className={`
+              group w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
+              text-gray-700 hover:bg-red-50 hover:text-red-600
+              transition-all duration-200 ease-in-out
+              ${isCollapsed ? 'justify-center' : ''}
+            `}
+                        title={isCollapsed ? 'Logout' : ''}
+                    >
+                        <svg className="w-5 h-5 text-gray-400 group-hover:text-red-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        {!isCollapsed && <span className="text-sm font-medium">Logout</span>}
+
+                        {isCollapsed && (
+                            <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
+                                Logout
+                            </div>
+                        )}
+                    </button>
+                </div>
             </div>
-        </div>
+        </>
     );
 };
 

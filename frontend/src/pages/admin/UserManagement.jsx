@@ -129,20 +129,24 @@ const UserManagement = () => {
     };
 
     return (
-        <div className="p-6">
-            <div className="flex justify-between items-center mb-6">
+        <div className="p-4 md:p-6">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-800">User Management</h1>
-                    <p className="text-gray-600 mt-1">Manage system users and their roles</p>
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-800">User Management</h1>
+                    <p className="text-sm md:text-base text-gray-600 mt-1">Manage system users and their roles</p>
                 </div>
                 <Button
                     variant="contained"
                     startIcon={<AddIcon />}
                     onClick={handleOpenModal}
+                    fullWidth
                     sx={{
                         background: 'linear-gradient(to right, #3b82f6, #8b5cf6)',
                         '&:hover': {
                             background: 'linear-gradient(to right, #2563eb, #7c3aed)',
+                        },
+                        '@media (min-width: 640px)': {
+                            width: 'auto',
                         },
                     }}
                 >
@@ -150,8 +154,8 @@ const UserManagement = () => {
                 </Button>
             </div>
 
-            <Paper elevation={0} sx={{ border: '1px solid #e5e7eb', borderRadius: 2, mb: 2, p: 2 }}>
-                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+            <Paper elevation={0} sx={{ border: '1px solid #e5e7eb', borderRadius: 2, mb: 2, p: { xs: 1.5, md: 2 } }}>
+                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 2, alignItems: 'stretch' }}>
                     <TextField
                         size="small"
                         placeholder="Search by name or email..."
@@ -180,7 +184,7 @@ const UserManagement = () => {
                             setRoleFilter(e.target.value);
                             setPage(0);
                         }}
-                        sx={{ minWidth: 150 }}
+                        sx={{ minWidth: { xs: '100%', md: 150 } }}
                     >
                         <MenuItem value="">All Roles</MenuItem>
                         <MenuItem value="admin">Admin</MenuItem>
@@ -191,7 +195,7 @@ const UserManagement = () => {
                 </Box>
             </Paper>
 
-            <Paper elevation={0} sx={{ border: '1px solid #e5e7eb', borderRadius: 2 }}>
+            <Paper elevation={0} sx={{ border: '1px solid #e5e7eb', borderRadius: 2, overflow: 'hidden' }}>
                 <TableContainer>
                     <Table>
                         <TableHead>
