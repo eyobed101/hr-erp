@@ -1,9 +1,19 @@
-﻿const Attendance = () => {
+﻿import AttendanceTable from "../../components/Attendance/AttendanceTable";
+import AttendanceForm from "../../components/Attendance/AttendanceForm";
+import AttendanceFilter from "../../components/Attendance/AttendanceFilter";
+
+const Attendance = () => {
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6">Attendance</h1>
+    <div className="p-6 space-y-6">
+      <h1 className="text-3xl font-bold">Attendance</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <AttendanceForm />
+        <AttendanceFilter />
+      </div>
+
+      {/* Attendance Table below */}
       <div className="bg-white p-6 rounded-lg shadow">
-        <p className="text-gray-600">Attendance tracking - Coming soon</p>
+        <AttendanceTable />
       </div>
     </div>
   );
