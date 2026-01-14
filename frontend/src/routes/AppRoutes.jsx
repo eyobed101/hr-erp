@@ -39,13 +39,12 @@ const AppRoutes = () => {
         if (!isAuthenticated) return '/login';
         return `${ROLE_ROUTES[role]}/dashboard`;
     };
-                <Route path="/employee/attendance" element={<RoleBasedRoute allowedRoles={[ROLES.EMPLOYEE]}><Attendance /></RoleBasedRoute>} />
+                
 
     return (
         <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
-            <Route path="/employee/attendance" element={<Attendance />} />
 
             <Route path="/" element={<Navigate to={getDefaultRoute()} replace />} />
 
@@ -72,6 +71,7 @@ const AppRoutes = () => {
                 <Route path="/employee/dashboard" element={<RoleBasedRoute allowedRoles={[ROLES.EMPLOYEE]}><EmployeeDashboard /></RoleBasedRoute>} />
                 <Route path="/employee/profile" element={<RoleBasedRoute allowedRoles={[ROLES.EMPLOYEE]}><Profile /></RoleBasedRoute>} />
                 <Route path="/employee/leave" element={<RoleBasedRoute allowedRoles={[ROLES.EMPLOYEE]}><LeaveRequest /></RoleBasedRoute>} />
+                <Route path="/employee/attendance" element={<RoleBasedRoute allowedRoles={[ROLES.EMPLOYEE]}><Attendance /></RoleBasedRoute>} />
             </Route>
 
             <Route path="*" element={<NotFound />} />

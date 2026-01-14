@@ -14,7 +14,7 @@
     "scripts": {
         "start": "node server.js",
         "seed": "node src/seeders/adminSeeder.js", 
-        "seed": "node src/seeders/hrSeeder.js",
+        "seeder": "node src/seeders/hrSeeder.js",
         "test": "echo \"Error: no test specified\" && exit 1"
     }
 }
