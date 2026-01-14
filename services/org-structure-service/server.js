@@ -6,6 +6,7 @@ require('dotenv').config();
 const HOST = '127.0.0.1';
 const PORT = process.env.PORT || 3001;
 const departmentRoutes = require('./src/routes/departmentRoutes.js');
+const jobCategoryRoutes = require('./src/routes/jobCategoryRoutes.js');
 
 app.use(express.json());
 
@@ -15,6 +16,7 @@ app.get('/', (req, res) => {
 
 
 app.use('/api/departments', departmentRoutes);
+app.use('/api/job-categories', jobCategoryRoutes);
 
 async function startServer() {
   try {
