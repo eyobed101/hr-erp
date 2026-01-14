@@ -16,6 +16,8 @@ export const NAVIGATION_CONFIG = {
     [ROLES.ADMIN]: [
         { path: '/admin/dashboard', label: 'Dashboard', icon: 'dashboard' },
         { path: '/admin/users', label: 'User Management', icon: 'users' },
+        { path: '/admin/departments', label: 'Departments', icon: 'departments' },
+        { path: '/admin/job-categories', label: 'Job Categories', icon: 'job-categories' },
         { path: '/admin/settings', label: 'Settings', icon: 'settings' },
         { path: '/admin/reports', label: 'Reports', icon: 'reports' },
     ],

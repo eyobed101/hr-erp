@@ -93,7 +93,7 @@ exports.getAllParentDepartments = async (req, res) => {
     }
 };
 
-// Update department
+// Optimized: Better Update Logic
 exports.updateDepartment = async (req, res) => {
     try {
         const deptId = req.params.id;
@@ -102,28 +102,33 @@ exports.updateDepartment = async (req, res) => {
         const dept = await Department.findByPk(deptId);
         if (!dept) return res.status(404).json({ error: 'Department not found' });
 
-        // Validation: check duplicate under same parent
+        // Prevent circular dependency: A department cannot be its own parent
+        if (parentDepartmentId && parseInt(parentDepartmentId) === parseInt(deptId)) {
+            return res.status(400).json({ error: "A department cannot be its own parent." });
+        }
+
+        // Check for duplicate name under the same parent (excluding current record)
         const existingDept = await Department.findOne({
             where: {
                 departmentName,
                 parentDepartmentId: parentDepartmentId || null,
-                id: { [Department.sequelize.Op.ne]: deptId } // exclude self
+                id: { [Department.sequelize.Op.ne]: deptId }
             }
         });
 
         if (existingDept) {
             return res.status(400).json({
-                error: `Department "${departmentName}" already exists under the same parent.`
+                error: `Department "${departmentName}" already exists under this parent.`
             });
         }
 
-        dept.departmentName = departmentName || dept.departmentName;
-        dept.description = description || dept.description;
-        dept.parentDepartmentId = parentDepartmentId !== undefined ? parentDepartmentId : dept.parentDepartmentId;
+        await dept.update({
+            departmentName: departmentName || dept.departmentName,
+            description: description !== undefined ? description : dept.description,
+            parentDepartmentId: parentDepartmentId === "" ? null : parentDepartmentId
+        });
 
-        await dept.save();
         res.json(dept);
-
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -145,23 +150,21 @@ exports.deleteDepartment = async (req, res) => {
 };
 
 // Get department by ID
-exports.getDepartmentById = async (req, res) => {
+
+
+exports.getDepartments = async (req, res) => {
     try {
-        const deptId = req.params.id;
-        const dept = await Department.findByPk(deptId);
-
-        if (!dept) {
-            return res.status(404).json({ error: 'Department not found' });
-        }
-
-        res.json({
-            id: dept.id,
-            departmentName: dept.departmentName,
-            description: dept.description,
-            parentDepartmentId: dept.parentDepartmentId
+        const departments = await Department.findAll({
+            // Include parent name so the frontend doesn't have to find it manually
+            include: [{
+                model: Department,
+                as: 'parentDepartment',
+                attributes: ['departmentName']
+            }]
         });
-
+        res.json(departments)
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 };
+

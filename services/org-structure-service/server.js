@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
 const sequelize = require('./src/config/db');
 const initializeDatabase = require('./src/config/initDb');
 require('dotenv').config();
@@ -8,6 +9,7 @@ const PORT = process.env.PORT || 3001;
 const departmentRoutes = require('./src/routes/departmentRoutes.js');
 const jobCategoryRoutes = require('./src/routes/jobCategoryRoutes.js');
 
+app.use(cors());
 app.use(express.json());
 
 app.get('/', (req, res) => {
@@ -15,16 +17,16 @@ app.get('/', (req, res) => {
 });
 
 
-app.use('/api/departments', departmentRoutes);
-app.use('/api/job-categories', jobCategoryRoutes);
+app.use('/api/organization/departments', departmentRoutes);
+app.use('/api/organization/job-categories', jobCategoryRoutes);
 
 async function startServer() {
   try {
-    
+
     await initializeDatabase();
     console.log('Database created/verified successfully');
 
-    await sequelize.sync({ alter: true }); 
+    await sequelize.sync({ alter: true });
     console.log('Database synced successfully');
 
     app.listen(PORT, HOST, () => {
