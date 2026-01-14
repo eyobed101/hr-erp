@@ -132,3 +132,126 @@ exports.getMyAttempts = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
+
+exports.getAllQuizzes = async (req, res) => {
+    try {
+        const quizzes = await Quiz.findAll({
+            include: [
+                { model: Course, as: 'course' },
+                { model: Question, as: 'questions' }
+            ]
+        });
+
+        res.status(200).json({ quizzes });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+exports.createQuiz = async (req, res) => {
+    try {
+        const { course_id, title, description, time_limit_minutes, max_attempts } = req.body;
+
+        const quiz = await Quiz.create({
+            course_id,
+            title,
+            description,
+            time_limit_minutes,
+            max_attempts
+        });
+
+        res.status(201).json({ message: 'Quiz created successfully', quiz });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+exports.addQuestion = async (req, res) => {
+    try {
+        const { quizId } = req.params;
+        const { question_text, option_a, option_b, option_c, option_d, correct_answer, points } = req.body;
+
+        const question = await Question.create({
+            quiz_id: quizId,
+            question_text,
+            option_a,
+            option_b,
+            option_c,
+            option_d,
+            correct_answer,
+            points
+        });
+
+        res.status(201).json({ message: 'Question added successfully', question });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+exports.updateQuiz = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { title, description, time_limit_minutes, max_attempts } = req.body;
+
+        const quiz = await Quiz.findByPk(id);
+        if (!quiz) return res.status(404).json({ message: 'Quiz not found' });
+
+        await quiz.update({ title, description, time_limit_minutes, max_attempts });
+        res.status(200).json({ message: 'Quiz updated successfully', quiz });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+exports.deleteQuiz = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const quiz = await Quiz.findByPk(id);
+        if (!quiz) return res.status(404).json({ message: 'Quiz not found' });
+
+        await quiz.destroy();
+        res.status(200).json({ message: 'Quiz deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+exports.updateQuestion = async (req, res) => {
+    try {
+        const { questionId } = req.params;
+        const { question_text, option_a, option_b, option_c, option_d, correct_answer, points } = req.body;
+
+        const question = await Question.findByPk(questionId);
+        if (!question) return res.status(404).json({ message: 'Question not found' });
+
+        await question.update({
+            question_text,
+            option_a,
+            option_b,
+            option_c,
+            option_d,
+            correct_answer,
+            points
+        });
+
+        res.status(200).json({ message: 'Question updated successfully', question });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+exports.deleteQuestion = async (req, res) => {
+    try {
+        const { questionId } = req.params;
+        const question = await Question.findByPk(questionId);
+        if (!question) return res.status(404).json({ message: 'Question not found' });
+
+        await question.destroy();
+        res.status(200).json({ message: 'Question deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+
+

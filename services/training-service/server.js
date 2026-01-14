@@ -71,7 +71,7 @@ async function startServer() {
     await initDb();
     console.log('Database initialized');
 
-    await sequelize.sync({ alter: false });
+    await sequelize.sync({ alter: true });
     console.log('Database synced successfully');
 
     app.listen(PORT, () => {

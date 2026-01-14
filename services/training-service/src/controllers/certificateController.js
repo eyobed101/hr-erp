@@ -84,3 +84,30 @@ exports.verifyCertificate = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
+
+exports.getAllCertificates = async (req, res) => {
+    try {
+        const { page = 1, limit = 10 } = req.query;
+        const offset = (page - 1) * limit;
+
+        const { count, rows } = await Certificate.findAndCountAll({
+            include: [{ model: Course, as: 'course' }],
+            limit: parseInt(limit),
+            offset: parseInt(offset),
+            order: [['issued_at', 'DESC']]
+        });
+
+        res.status(200).json({
+            certificates: rows,
+            pagination: {
+                total: count,
+                page: parseInt(page),
+                limit: parseInt(limit),
+                totalPages: Math.ceil(count / limit)
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+

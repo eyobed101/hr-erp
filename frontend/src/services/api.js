@@ -120,10 +120,22 @@ export const trainingAPI = {
     getCourseProgress: (courseId) => trainingService.get(`/enrollments/${courseId}/progress`),
 
     getQuiz: (courseId) => trainingService.get(`/quizzes/course/${courseId}`),
+    getAllQuizzes: () => trainingService.get('/quizzes'),
+    createQuiz: (data) => trainingService.post('/quizzes', data),
+    updateQuiz: (id, data) => trainingService.put(`/quizzes/${id}`, data),
+    deleteQuiz: (id) => trainingService.delete(`/quizzes/${id}`),
+    addQuestion: (quizId, data) => trainingService.post(`/quizzes/${quizId}/questions`, data),
+    updateQuestion: (questionId, data) => trainingService.put(`/quizzes/actions/update-question/${questionId}`, data),
+    deleteQuestion: (questionId) => trainingService.delete(`/quizzes/actions/delete-question/${questionId}`),
+
     submitQuiz: (quizId, data) => trainingService.post(`/quizzes/${quizId}/attempt`, data),
 
+
+
     getMyCertificates: () => trainingService.get('/certificates/my'),
+    getAllCertificates: (params) => trainingService.get('/certificates', { params }),
     downloadCertificate: (id) => trainingService.get(`/certificates/${id}/download`, { responseType: 'blob' }),
+
 
     getSkills: () => trainingService.get('/skills'),
     getMySkillGaps: () => trainingService.get('/skills/gaps/my'),

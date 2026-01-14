@@ -1,6 +1,6 @@
-const jwt = require('jsonwebtoken');
+const axios = require('axios');
 
-const auth = (req, res, next) => {
+const auth = async (req, res, next) => {
     try {
         const token = req.header('Authorization')?.replace('Bearer ', '');
 
@@ -8,11 +8,21 @@ const auth = (req, res, next) => {
             return res.status(401).json({ message: 'No authentication token provided' });
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded;
-        next();
+        const response = await axios.post(`${process.env.AUTH_SERVICE_URL}/api/auth/validate`, {}, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (response.data && response.data.valid) {
+            req.user = response.data.user;
+            next();
+        } else {
+            res.status(401).json({ message: 'Invalid authentication token' });
+        }
     } catch (error) {
-        res.status(401).json({ message: 'Invalid authentication token' });
+        console.error('Auth service validation error:', error.response?.data || error.message);
+        res.status(401).json({ message: 'Authentication failed' });
     }
 };
 
