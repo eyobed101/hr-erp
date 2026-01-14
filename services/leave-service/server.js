@@ -2,22 +2,22 @@ import "dotenv/config";
 import express from 'express';
 import sequelize from './src/config/db.js';
 import initializeDatabase from './src/config/init_db.js';
+import cors from 'cors';
 
 const app = express();
 
 import leaveRoutes from './src/routes/leaveRoutes.js';
-import adminRoutes from './src/routes/adminRoutes.js';
+
 const PORT = process.env.PORT || 3001;
 const HOST = process.env.HOST || "localhost";
 
 app.use(express.json());
-app.use('/api/leave', leaveRoutes);
-app.use('/api/admin', adminRoutes);
+app.use(cors());
+app.use(leaveRoutes);
 
-app.get('/', (req, res) => {
-  console.log(req.socket.address)
+app.get("/", (_req, res)=>{
   res.send({ message: 'leave service is running' });
-});
+})
 
 async function startServer() {
   try {

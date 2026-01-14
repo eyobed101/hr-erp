@@ -41,6 +41,7 @@ const LeaveRequest = sequelize.define(
 
     start_date: {
       type: DataTypes.DATEONLY,
+      defaultValue: DataTypes.NOW,
       allowNull: false,
     },
 

@@ -1,20 +1,15 @@
 import express from 'express';
-import authMiddleware from '../middleware/authMiddleware.js';
-import {
-    createLeaveRequest,
-    getMyRequests,
-    updateLeaveRequest,
-    cancelLeaveRequest
-} from '../controllers/leaveController.js';
+import { getAllPendingLeaveRequests } from '../controllers/leaveController.js';
+//import authMiddleware from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// protect all routes
-router.use(authMiddleware);
+router.get('/getAllPending', getAllPendingLeaveRequests);
 
-router.post('/', createLeaveRequest);
-router.get('/', getMyRequests);
-router.put('/:id', updateLeaveRequest);
-router.put('/:id/cancel', cancelLeaveRequest);
-
+// router.post('/', createLeaveRequest);
+// router.get('/', getMyRequests);
+// router.put('/:id', updateLeaveRequest);
+// router.put('/:id/cancel', cancelLeaveRequest);
+// router.put("/getAllPending", getAllPendingLeaveRequests)
+// router.put("/", (req, res)=>{ return "Hello There!"; })
 export default router;
