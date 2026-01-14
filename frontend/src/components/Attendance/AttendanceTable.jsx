@@ -1,44 +1,22 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 export default function AttendanceTable() {
-  const employees = [
-    {
-      id: 1,
-      name: 'John Doe',
-      clockIn: '2026-01-14T08:30:00',
-      clockOut: '2026-01-14T17:00:00',
-      shiftStart: '2026-01-14T08:00:00',
-      shiftEnd: '2026-01-14T16:00:00',
-      status: 'Present',
-    },
-    {
-      id: 2,
-      name: 'Jane Smith',
-      clockIn: '2026-01-14T09:15:00',
-      clockOut: '2026-01-14T15:00:00',
-      shiftStart: '2026-01-14T08:00:00',
-      shiftEnd: '2026-01-14T16:00:00',
-      status: 'Late',
-    },
-    {
-      id: 3,
-      name: 'Michael Lee',
-      clockIn: null,
-      clockOut: null,
-      shiftStart: '2026-01-14T08:00:00',
-      shiftEnd: '2026-01-14T16:00:00',
-      status: 'Absent',
-    },
-    {
-      id: 4,
-      name: 'Sarah Kim',
-      clockIn: '2026-01-14T08:00:00',
-      clockOut: '2026-01-14T12:00:00',
-      shiftStart: '2026-01-14T08:00:00',
-      shiftEnd: '2026-01-14T16:00:00',
-      status: 'Half Day',
-    },
-  ];
+  const [attendances, setAttendances] = useState([]);
+
+  useEffect(() => {
+    const fetchAttendance = async () => {
+      try {
+        // Adjust URL to match your backend route
+        const res = await axios.get("http://localhost:5000/api/attendance");
+        setAttendances(res.data); // backend should return array of attendance records
+      } catch (err) {
+        console.error("Error fetching attendance:", err);
+      }
+    };
+
+    fetchAttendance();
+  }, []);
 
   return (
     <div className="overflow-x-auto">
@@ -54,34 +32,14 @@ export default function AttendanceTable() {
           </tr>
         </thead>
         <tbody>
-          {employees.map((emp) => (
+          {attendances.map((emp) => (
             <tr key={emp.id} className="border-t hover:bg-gray-50">
-              <td className="px-4 py-2 text-sm text-gray-800">{emp.name}</td>
-              <td className="px-4 py-2 text-sm text-gray-800">
-                {emp.clockIn ? new Date(emp.clockIn).toLocaleTimeString() : '-'}
-              </td>
-              <td className="px-4 py-2 text-sm text-gray-800">
-                {emp.clockOut ? new Date(emp.clockOut).toLocaleTimeString() : '-'}
-              </td>
-              <td className="px-4 py-2 text-sm text-gray-800">
-                {new Date(emp.shiftStart).toLocaleTimeString()}
-              </td>
-              <td className="px-4 py-2 text-sm text-gray-800">
-                {new Date(emp.shiftEnd).toLocaleTimeString()}
-              </td>
-              <td
-                className={`px-4 py-2 text-sm font-medium ${
-                  emp.status === 'Present'
-                    ? 'text-green-600'
-                    : emp.status === 'Late'
-                    ? 'text-yellow-600'
-                    : emp.status === 'Absent'
-                    ? 'text-red-600'
-                    : 'text-blue-600'
-                }`}
-              >
-                {emp.status}
-              </td>
+              <td className="px-4 py-2">{emp.name}</td>
+              <td className="px-4 py-2">{emp.clockIn || "-"}</td>
+              <td className="px-4 py-2">{emp.clockOut || "-"}</td>
+              <td className="px-4 py-2">{emp.shiftStart}</td>
+              <td className="px-4 py-2">{emp.shiftEnd}</td>
+              <td className="px-4 py-2">{emp.status}</td>
             </tr>
           ))}
         </tbody>

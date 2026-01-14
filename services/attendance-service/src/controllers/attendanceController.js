@@ -105,7 +105,37 @@ const getAttendanceByEmployee = async (req, res) => {
   }
 };
 
+
+const getTodayAttendance = async (req, res) => {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+
+    const records = await Attendance.findAll({
+      where: { clock_date: today },
+      order: [['clock_in', 'ASC']]
+    });
+
+    res.json(records);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+const getAttendance = async (req, res) => {
+  try {
+    const records = await Attendance.findAll({
+      order: [['clock_date', 'DESC']]
+    });
+    res.json(records);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+}
+
 module.exports = {
+  getAttendance,
+  getTodayAttendance,
   markAttendance,
   clockOut,
   getAttendanceByDate,

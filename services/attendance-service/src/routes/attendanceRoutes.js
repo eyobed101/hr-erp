@@ -11,7 +11,8 @@ router.put('/clockout/:id', attendanceController.clockOut);
 // Get Attendance by Date
 // Example: GET /api/attendance/date?date=2026-01-14
 router.get('/date', attendanceController.getAttendanceByDate);
-
+router.get('/today', attendanceController.getTodayAttendance);
+router.get('/', attendanceController.getAttendance)
 // Get Attendance by Employee
 // Example: GET /api/attendance/employee/1
 router.get('/employee/:employee_id', attendanceController.getAttendanceByEmployee);
