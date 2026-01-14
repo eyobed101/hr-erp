@@ -1,4 +1,3 @@
-
 /// CREATE TABLE leave_requests (
 ///     id              INT AUTO_INCREMENT PRIMARY KEY,
 ///     employee_id     INT NOT NULL,

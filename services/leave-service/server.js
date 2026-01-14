@@ -5,16 +5,18 @@ import initializeDatabase from './src/config/init_db.js';
 
 const app = express();
 
-/// const leaveRoutes = require('./src/routes/leaveRoutes');
+import leaveRoutes from './src/routes/leaveRoutes.js';
+import adminRoutes from './src/routes/adminRoutes.js';
 const PORT = process.env.PORT || 3001;
 const HOST = process.env.HOST || "localhost";
 
 app.use(express.json());
-// app.use('/api/leave', leaveRoutes);
+app.use('/api/leave', leaveRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.get('/', (req, res) => {
   console.log(req.socket.address)
-  res.send({message: 'leave service is running'});
+  res.send({ message: 'leave service is running' });
 });
 
 async function startServer() {
@@ -22,7 +24,7 @@ async function startServer() {
     await initializeDatabase();
     console.log('Database created/verified successfully');
 
-    await sequelize.sync({ alter: true});
+    await sequelize.sync({ alter: true });
     console.log('Database synced successfully');
 
     app.listen(PORT, HOST, () => {
