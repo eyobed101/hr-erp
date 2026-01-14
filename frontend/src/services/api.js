@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const SERVICE_PORTS = {
-    auth: 3001,
+    auth: 3000,
     employee: 3002,
     recruitment: 3003,
     leave: 3004,

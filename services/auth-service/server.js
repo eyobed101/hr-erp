@@ -4,6 +4,7 @@ const authRoutes = require('./src/routes/authRoutes');
 const profileRoutes = require('./src/routes/profileRoutes');
 const sequelize = require('./src/config/db');
 const initializeDatabase = require('./src/config/initDb');
+const cors = require('cors');
 require('dotenv').config();
 const HOST = '127.0.0.1';
 
@@ -11,6 +12,7 @@ const HOST = '127.0.0.1';
 const PORT = process.env.PORT || 3001;
 
 app.use(express.json());
+app.use(cors())
 
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
