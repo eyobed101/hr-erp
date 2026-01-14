@@ -1,4 +1,3 @@
-import sequelize from "../config/db.js"
 
 /// CREATE TABLE leave_requests (
 ///     id              INT AUTO_INCREMENT PRIMARY KEY,
@@ -16,10 +15,10 @@ import sequelize from "../config/db.js"
 /// );
 
 import { DataTypes } from "sequelize";
-import sequelize from "../config/db.js";
+import sequelize from "../config/db.js"
 
-export const LeaveRequest = sequelize.define(
-  "LeaveRequest",
+const LeaveRequest = sequelize.define(
+  "leave_request",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -30,10 +29,6 @@ export const LeaveRequest = sequelize.define(
     employee_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: "emp_employees",
-        key: "id",
-      },
     },
 
     leave_type: {
@@ -75,10 +70,6 @@ export const LeaveRequest = sequelize.define(
     approver_id: {
       type: DataTypes.INTEGER,
       allowNull: true,
-      references: {
-        model: "emp_employees",
-        key: "id",
-      },
     },
 
     created_at: {
@@ -97,3 +88,5 @@ export const LeaveRequest = sequelize.define(
     underscored: true,
   }
 );
+
+export default LeaveRequest;

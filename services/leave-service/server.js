@@ -3,7 +3,6 @@ import express from 'express';
 import sequelize from './src/config/db.js';
 import initializeDatabase from './src/config/init_db.js';
 
-
 const app = express();
 
 /// const leaveRoutes = require('./src/routes/leaveRoutes');
@@ -23,11 +22,11 @@ async function startServer() {
     await initializeDatabase();
     console.log('Database created/verified successfully');
 
-    await sequelize.sync({ alter: false });
+    await sequelize.sync({ alter: true});
     console.log('Database synced successfully');
 
     app.listen(PORT, HOST, () => {
-      console.log(`leave service running on port ${PORT}`);
+      console.log(`leave service running on port: ${PORT}`);
     });
   } catch (error) {
     console.error('Unable to start server:', error);
