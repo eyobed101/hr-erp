@@ -20,10 +20,13 @@ const enrollmentRoutes = require('./src/routes/enrollmentRoutes');
 const quizRoutes = require('./src/routes/quizRoutes');
 const certificateRoutes = require('./src/routes/certificateRoutes');
 const skillRoutes = require('./src/routes/skillRoutes');
+const cors = require('cors');
+
 
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 
 Course.hasMany(Lesson, { foreignKey: 'course_id', as: 'lessons' });
 Lesson.belongsTo(Course, { foreignKey: 'course_id', as: 'course' });

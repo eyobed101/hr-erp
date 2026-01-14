@@ -1,19 +1,21 @@
 import axios from 'axios';
 
-const SERVICE_PORTS = {
-    auth: 3000,
-    employee: 3002,
-    recruitment: 3003,
-    leave: 3004,
-    attendance: 3005,
-    organization: 3006,
-    training: 3007,
-    benefits: 3008,
-};
+const API_BASE_URL = 'http://localhost';
 
 const createServiceInstance = (serviceName) => {
+    const ports = {
+        auth: 3000,
+        employee: 3002,
+        recruitment: 3003,
+        leave: 3004,
+        attendance: 3005,
+        organization: 3006,
+        training: 3007,
+        benefits: 3008,
+    };
+
     const instance = axios.create({
-        baseURL: `http://localhost:${SERVICE_PORTS[serviceName]}/api`,
+        baseURL: `${API_BASE_URL}:${ports[serviceName]}/api`,
         headers: {
             'Content-Type': 'application/json',
         },
@@ -27,7 +29,9 @@ const createServiceInstance = (serviceName) => {
             }
             return config;
         },
-        (error) => Promise.reject(error)
+        (error) => {
+            return Promise.reject(error);
+        }
     );
 
     instance.interceptors.response.use(
@@ -35,6 +39,7 @@ const createServiceInstance = (serviceName) => {
         (error) => {
             if (error.response?.status === 401) {
                 localStorage.removeItem('token');
+                localStorage.removeItem('user');
                 localStorage.removeItem('role');
                 window.location.href = '/login';
             }
@@ -64,12 +69,12 @@ export const authAPI = {
 export const profileAPI = {
     getProfile: (userId) => authService.get(userId ? `/profile/${userId}` : '/profile/me'),
     createProfile: (profileData) => authService.post('/profile', profileData),
-    updateProfile: (profileData) => authService.put('/profile', profileData),
-    deleteProfile: () => authService.delete('/profile'),
+    updateProfile: (userId, profileData) => authService.put(`/profile/${userId}`, profileData),
+    deleteProfile: (userId) => authService.delete(`/profile/${userId}`),
 };
 
 export const employeeAPI = {
-    getEmployees: (params) => employeeService.get('/employees', { params }),
+    getEmployees: () => employeeService.get('/employees'),
     getEmployee: (id) => employeeService.get(`/employees/${id}`),
     createEmployee: (data) => employeeService.post('/employees', data),
     updateEmployee: (id, data) => employeeService.put(`/employees/${id}`, data),
@@ -77,37 +82,52 @@ export const employeeAPI = {
 };
 
 export const recruitmentAPI = {
-    getApplications: (params) => recruitmentService.get('/applications', { params }),
-    getApplication: (id) => recruitmentService.get(`/applications/${id}`),
-    createApplication: (data) => recruitmentService.post('/applications', data),
-    updateApplication: (id, data) => recruitmentService.put(`/applications/${id}`, data),
+    getJobs: () => recruitmentService.get('/jobs'),
+    getJob: (id) => recruitmentService.get(`/jobs/${id}`),
+    applyJob: (id, data) => recruitmentService.post(`/jobs/${id}/apply`, data),
 };
 
 export const leaveAPI = {
-    getLeaves: (params) => leaveService.get('/leaves', { params }),
+    getLeaves: () => leaveService.get('/leaves'),
     getLeave: (id) => leaveService.get(`/leaves/${id}`),
     createLeave: (data) => leaveService.post('/leaves', data),
-    approveLeave: (id) => leaveService.put(`/leaves/${id}/approve`),
-    rejectLeave: (id) => leaveService.put(`/leaves/${id}/reject`),
+    updateLeave: (id, data) => leaveService.put(`/leaves/${id}`, data),
+    approveLeave: (id) => leaveService.post(`/leaves/${id}/approve`),
+    rejectLeave: (id) => leaveService.post(`/leaves/${id}/reject`),
 };
 
 export const attendanceAPI = {
-    getAttendance: (params) => attendanceService.get('/attendance', { params }),
-    clockIn: (data) => attendanceService.post('/attendance/clock-in', data),
-    clockOut: (data) => attendanceService.post('/attendance/clock-out', data),
+    getAttendance: () => attendanceService.get('/attendance'),
+    checkIn: () => attendanceService.post('/attendance/checkin'),
+    checkOut: () => attendanceService.post('/attendance/checkout'),
 };
 
 export const organizationAPI = {
-    getStructure: () => organizationService.get('/structure'),
     getDepartments: () => organizationService.get('/departments'),
+    getDepartment: (id) => organizationService.get(`/departments/${id}`),
     createDepartment: (data) => organizationService.post('/departments', data),
-    updateDepartment: (id, data) => organizationService.put(`/departments/${id}`, data),
 };
 
 export const trainingAPI = {
-    getTrainings: (params) => trainingService.get('/trainings', { params }),
-    getTraining: (id) => trainingService.get(`/trainings/${id}`),
-    enrollTraining: (id) => trainingService.post(`/trainings/${id}/enroll`),
+    getCourses: (params) => trainingService.get('/courses', { params }),
+    getCourse: (id) => trainingService.get(`/courses/${id}`),
+    createCourse: (data) => trainingService.post('/courses', data),
+    updateCourse: (id, data) => trainingService.put(`/courses/${id}`, data),
+    deleteCourse: (id) => trainingService.delete(`/courses/${id}`),
+
+    enrollCourse: (data) => trainingService.post('/enrollments', data),
+    getMyEnrollments: () => trainingService.get('/enrollments/my'),
+    getCourseProgress: (courseId) => trainingService.get(`/enrollments/${courseId}/progress`),
+
+    getQuiz: (courseId) => trainingService.get(`/quizzes/course/${courseId}`),
+    submitQuiz: (quizId, data) => trainingService.post(`/quizzes/${quizId}/attempt`, data),
+
+    getMyCertificates: () => trainingService.get('/certificates/my'),
+    downloadCertificate: (id) => trainingService.get(`/certificates/${id}/download`, { responseType: 'blob' }),
+
+    getSkills: () => trainingService.get('/skills'),
+    getMySkillGaps: () => trainingService.get('/skills/gaps/my'),
+    getRecommendedCourses: () => trainingService.get('/skills/recommendations'),
 };
 
 export const benefitsAPI = {

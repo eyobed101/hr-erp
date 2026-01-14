@@ -13,6 +13,7 @@ import Unauthorized from '../pages/common/Unauthorized';
 
 import AdminDashboard from '../pages/admin/Dashboard';
 import UserManagement from '../pages/admin/UserManagement';
+import TrainingManagement from '../pages/admin/TrainingManagement';
 import Settings from '../pages/admin/Settings';
 import Reports from '../pages/admin/Reports';
 
@@ -51,6 +52,7 @@ const AppRoutes = () => {
                 <Route path="/admin" element={<RoleBasedRoute allowedRoles={[ROLES.ADMIN]}><Navigate to="/admin/dashboard" /></RoleBasedRoute>} />
                 <Route path="/admin/dashboard" element={<RoleBasedRoute allowedRoles={[ROLES.ADMIN]}><AdminDashboard /></RoleBasedRoute>} />
                 <Route path="/admin/users" element={<RoleBasedRoute allowedRoles={[ROLES.ADMIN]}><UserManagement /></RoleBasedRoute>} />
+                <Route path="/admin/training" element={<RoleBasedRoute allowedRoles={[ROLES.ADMIN]}><TrainingManagement /></RoleBasedRoute>} />
                 <Route path="/admin/settings" element={<RoleBasedRoute allowedRoles={[ROLES.ADMIN]}><Settings /></RoleBasedRoute>} />
                 <Route path="/admin/reports" element={<RoleBasedRoute allowedRoles={[ROLES.ADMIN]}><Reports /></RoleBasedRoute>} />
 
