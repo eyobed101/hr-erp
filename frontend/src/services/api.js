@@ -5,8 +5,8 @@ const API_BASE_URL = 'http://localhost';
 const createServiceInstance = (serviceName) => {
     const ports = {
         auth: 3000,
-        employee: 3002,
-        recruitment: 3003,
+        employee: 3001,
+        recruitment: 3002,
         leave: 3004,
         attendance: 3005,
         organization: 3006,
@@ -82,71 +82,51 @@ export const employeeAPI = {
 };
 
 export const recruitmentAPI = {
-    getJobs: () => recruitmentService.get('/jobs'),
-    getJob: (id) => recruitmentService.get(`/jobs/${id}`),
-    applyJob: (id, data) => recruitmentService.post(`/jobs/${id}/apply`, data),
+    // Jobs
+    getJobs: (params) => recruitmentService.get('recruitment/jobs', { params }),
+    getJob: (id) => recruitmentService.get(`recruitment/jobs/${id}`),
+    createJob: (data) => recruitmentService.post('recruitment/jobs', data),
+    updateJob: (id, data) => recruitmentService.put(`recruitment/jobs/${id}`, data),
+    deleteJob: (id) => recruitmentService.delete(`recruitment/jobs/${id}`),
+
+    // Applications
+    getApplications: (params) => recruitmentService.get('recruitment/applications', { params }),
+    getApplication: (id) => recruitmentService.get(`recruitment/applications/${id}`),
+    createApplication: (data) => recruitmentService.post('recruitment/applications', data),
+    updateApplicationStage: (id, data) => recruitmentService.patch(`recruitment/applications/${id}/stage`, data),
 };
 
 export const leaveAPI = {
-    getLeaves: () => leaveService.get('/leaves'),
-    getLeave: (id) => leaveService.get(`/leaves/${id}`),
-    createLeave: (data) => leaveService.post('/leaves', data),
-    updateLeave: (id, data) => leaveService.put(`/leaves/${id}`, data),
-    approveLeave: (id) => leaveService.post(`/leaves/${id}/approve`),
-    rejectLeave: (id) => leaveService.post(`/leaves/${id}/reject`),
+    getLeaves: (params) => leaveService.get('leaves', { params }),
+    getLeave: (id) => leaveService.get(`leaves/${id}`),
+    createLeave: (data) => leaveService.post('leaves', data),
+    approveLeave: (id) => leaveService.put(`leaves/${id}/approve`),
+    rejectLeave: (id) => leaveService.put(`leaves/${id}/reject`),
 };
 
 export const attendanceAPI = {
-    getAttendance: () => attendanceService.get('/attendance'),
-    checkIn: () => attendanceService.post('/attendance/checkin'),
-    checkOut: () => attendanceService.post('/attendance/checkout'),
+    getAttendance: (params) => attendanceService.get('attendance', { params }),
+    clockIn: (data) => attendanceService.post('attendance/clock-in', data),
+    clockOut: (data) => attendanceService.post('attendance/clock-out', data),
 };
 
 export const organizationAPI = {
-    getDepartments: () => organizationService.get('/departments'),
-    getDepartment: (id) => organizationService.get(`/departments/${id}`),
-    createDepartment: (data) => organizationService.post('/departments', data),
+    getStructure: () => organizationService.get('structure'),
+    getDepartments: () => organizationService.get('departments'),
+    createDepartment: (data) => organizationService.post('departments', data),
+    updateDepartment: (id, data) => organizationService.put(`departments/${id}`, data),
 };
 
 export const trainingAPI = {
-    getCourses: (params) => trainingService.get('/courses', { params }),
-    getCourse: (id) => trainingService.get(`/courses/${id}`),
-    createCourse: (data) => trainingService.post('/courses', data),
-    updateCourse: (id, data) => trainingService.put(`/courses/${id}`, data),
-    deleteCourse: (id) => trainingService.delete(`/courses/${id}`),
-
-    enrollCourse: (data) => trainingService.post('/enrollments', data),
-    getMyEnrollments: () => trainingService.get('/enrollments/my'),
-    getCourseProgress: (courseId) => trainingService.get(`/enrollments/${courseId}/progress`),
-
-    getQuiz: (courseId) => trainingService.get(`/quizzes/course/${courseId}`),
-    getAllQuizzes: () => trainingService.get('/quizzes'),
-    createQuiz: (data) => trainingService.post('/quizzes', data),
-    updateQuiz: (id, data) => trainingService.put(`/quizzes/${id}`, data),
-    deleteQuiz: (id) => trainingService.delete(`/quizzes/${id}`),
-    addQuestion: (quizId, data) => trainingService.post(`/quizzes/${quizId}/questions`, data),
-    updateQuestion: (questionId, data) => trainingService.put(`/quizzes/actions/update-question/${questionId}`, data),
-    deleteQuestion: (questionId) => trainingService.delete(`/quizzes/actions/delete-question/${questionId}`),
-
-    submitQuiz: (quizId, data) => trainingService.post(`/quizzes/${quizId}/attempt`, data),
-    getQuizAttemptsCount: (quizId) => trainingService.get(`/quizzes/${quizId}/attempts/count`),
-
-
-
-    getMyCertificates: () => trainingService.get('/certificates/my'),
-    getAllCertificates: (params) => trainingService.get('/certificates', { params }),
-    downloadCertificate: (id) => trainingService.get(`/certificates/${id}/download`, { responseType: 'blob' }),
-
-
-    getSkills: () => trainingService.get('/skills'),
-    getMySkillGaps: () => trainingService.get('/skills/gaps/my'),
-    getRecommendedCourses: () => trainingService.get('/skills/recommendations'),
+    getTrainings: (params) => trainingService.get('trainings', { params }),
+    getTraining: (id) => trainingService.get(`trainings/${id}`),
+    enrollTraining: (id) => trainingService.post(`trainings/${id}/enroll`),
 };
 
 export const benefitsAPI = {
-    getBenefits: () => benefitsService.get('/benefits'),
-    getBenefit: (id) => benefitsService.get(`/benefits/${id}`),
-    enrollBenefit: (id, data) => benefitsService.post(`/benefits/${id}/enroll`, data),
+    getBenefits: () => benefitsService.get('benefits'),
+    getBenefit: (id) => benefitsService.get(`benefits/${id}`),
+    enrollBenefit: (id, data) => benefitsService.post(`benefits/${id}/enroll`, data),
 };
 
 export default {
