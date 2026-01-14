@@ -56,8 +56,26 @@ exports.submitQuizAttempt = async (req, res) => {
         let correctAnswers = 0;
         const totalQuestions = quiz.questions.length;
 
+        // Helper to convert option_a format to A format
+        const normalizeAnswer = (answer) => {
+            if (!answer) return null;
+            // If answer is already in A/B/C/D format, return as is
+            if (['A', 'B', 'C', 'D'].includes(answer.toUpperCase())) {
+                return answer.toUpperCase();
+            }
+            // Convert option_a format to A format
+            const match = answer.match(/option_([a-d])/i);
+            if (match) {
+                return match[1].toUpperCase();
+            }
+            return null;
+        };
+
         quiz.questions.forEach(question => {
-            if (answers[question.id] === question.correct_answer) {
+            const userAnswer = normalizeAnswer(answers[question.id]);
+            const correctAnswer = question.correct_answer;
+
+            if (userAnswer === correctAnswer) {
                 correctAnswers++;
             }
         });
@@ -99,6 +117,18 @@ exports.submitQuizAttempt = async (req, res) => {
                     pdf_path: pdfData.filePath
                 });
             }
+
+            // Update enrollment to completed and passed
+            const Enrollment = require('../models/enrollmentModel');
+            await Enrollment.update(
+                {
+                    status: 'completed',
+                    completed_at: new Date(),
+                    progress_percentage: 100,
+                    passed: true
+                },
+                { where: { user_id, course_id: quiz.course_id } }
+            );
         }
 
         res.status(201).json({
@@ -128,6 +158,33 @@ exports.getMyAttempts = async (req, res) => {
         });
 
         res.status(200).json({ attempts });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+exports.getQuizAttemptsCount = async (req, res) => {
+    try {
+        const { quizId } = req.params;
+        const user_id = req.user.id;
+
+        const quiz = await Quiz.findByPk(quizId);
+        if (!quiz) {
+            return res.status(404).json({ message: 'Quiz not found' });
+        }
+
+        const attemptsCount = await QuizAttempt.count({
+            where: { user_id, quiz_id: quizId }
+        });
+
+        const remainingAttempts = quiz.max_attempts - attemptsCount;
+
+        res.status(200).json({
+            attemptsCount,
+            maxAttempts: quiz.max_attempts,
+            remainingAttempts: Math.max(0, remainingAttempts),
+            canAttempt: remainingAttempts > 0
+        });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }

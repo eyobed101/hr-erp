@@ -129,6 +129,7 @@ export const trainingAPI = {
     deleteQuestion: (questionId) => trainingService.delete(`/quizzes/actions/delete-question/${questionId}`),
 
     submitQuiz: (quizId, data) => trainingService.post(`/quizzes/${quizId}/attempt`, data),
+    getQuizAttemptsCount: (quizId) => trainingService.get(`/quizzes/${quizId}/attempts/count`),
 
 
 

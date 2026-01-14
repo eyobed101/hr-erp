@@ -37,5 +37,6 @@ export const NAVIGATION_CONFIG = {
         { path: '/employee/profile', label: 'My Profile', icon: 'profile' },
         { path: '/employee/leave', label: 'Leave Requests', icon: 'leave' },
         { path: '/employee/attendance', label: 'Attendance', icon: 'attendance' },
+        { path: '/employee/courses', label: 'My Courses', icon: 'courses' },
     ],
 };

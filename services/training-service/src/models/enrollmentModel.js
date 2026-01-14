@@ -34,6 +34,11 @@ const Enrollment = sequelize.define('Enrollment', {
     progress_percentage: {
         type: DataTypes.INTEGER,
         defaultValue: 0
+    },
+    passed: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        comment: 'Whether the user passed the course quiz'
     }
 }, {
     tableName: 'enrollments',

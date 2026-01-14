@@ -18,6 +18,7 @@ router.delete('/:id', auth, checkRole('admin', 'hr'), quizController.deleteQuiz)
 
 // User/Course routes
 router.get('/course/:courseId', auth, quizController.getQuiz);
+router.get('/:quizId/attempts/count', auth, quizController.getQuizAttemptsCount);
 router.post('/:quizId/attempt', auth, quizController.submitQuizAttempt);
 router.get('/attempts/my', auth, quizController.getMyAttempts);
 
