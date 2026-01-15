@@ -7,12 +7,12 @@ services:
     container_name: hr-erp-mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_password}
-      MYSQL_DATABASE: hr_erp # Default DB, others created by init.sql
+      MYSQL_DATABASE: hr_erp
     volumes:
       - mysql_data:/var/lib/mysql
       - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - "3307:3306"  # Expose on 3307 to avoid conflict with local MySQL
+      - "3307:3306"
     networks:
       - hr-erp-network
     healthcheck:
@@ -21,7 +21,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # Auth Service
+  # Auth Service (3000)
   auth-service:
     build:
       context: ./services/auth-service
@@ -41,7 +41,7 @@ services:
       - hr-erp-network
     restart: unless-stopped
 
-  # Recruitment Service
+  # Recruitment Service (3001)
   recruitment-service:
     build:
       context: ./services/recruitment-service
@@ -61,6 +61,159 @@ services:
       - hr-erp-network
     restart: unless-stopped
 
+  # Employee Service (3002)
+  employee-service:
+    build:
+      context: ./services/employee-service
+      dockerfile: Dockerfile
+    container_name: hr-erp-employee
+    env_file:
+      - ./services/employee-service/.env
+    environment:
+      - DB_HOST=mysql
+      - DB_DIALECT=mysql
+    ports:
+      - "3002:3002"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - hr-erp-network
+    restart: unless-stopped
+
+  # Leave Service (3003)
+  leave-service:
+    build:
+      context: ./services/leave-service
+      dockerfile: Dockerfile
+    container_name: hr-erp-leave
+    env_file:
+      - ./services/leave-service/.env
+    environment:
+      - DB_HOST=mysql
+      - AUTH_SERVICE_URL=http://auth-service:3000/api/auth
+      - EMPLOYEE_SERVICE_URL=http://employee-service:3002/api/employees
+    ports:
+      - "3003:3003"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+      employee-service:
+        condition: service_started
+    networks:
+      - hr-erp-network
+    restart: unless-stopped
+
+  # Attendance Service (3005)
+  attendance-service:
+    build:
+      context: ./services/attendance-service
+      dockerfile: Dockerfile
+    container_name: hr-erp-attendance
+    env_file:
+      - ./services/attendance-service/.env
+    environment:
+      - DB_HOST=mysql
+      - PORT=3005
+    ports:
+      - "3005:3005"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - hr-erp-network
+    restart: unless-stopped
+
+  # Org Structure Service (3006)
+  org-structure-service:
+    build:
+      context: ./services/org-structure-service
+      dockerfile: Dockerfile
+    container_name: hr-erp-org-structure
+    env_file:
+      - ./services/org-structure-service/.env
+    environment:
+      - DB_HOST=mysql
+      - PORT=3006
+    ports:
+      - "3006:3006"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - hr-erp-network
+    restart: unless-stopped
+
+  # Training Service (3007)
+  training-service:
+    build:
+      context: ./services/training-service
+      dockerfile: Dockerfile
+    container_name: hr-erp-training
+    env_file:
+      - ./services/training-service/.env
+    environment:
+      - DB_HOST=mysql
+      - AUTH_SERVICE_URL=http://auth-service:3000
+    ports:
+      - "3007:3007"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - hr-erp-network
+    restart: unless-stopped
+
+  # Benefits Service (3008)
+  benefits-service:
+    build:
+      context: ./services/benefits-service
+      dockerfile: Dockerfile
+    container_name: hr-erp-benefits
+    env_file:
+      - ./services/benefits-service/.env
+    environment:
+      - DB_HOST=mysql
+      - PORT=3008
+      - DB_NAME=benefits_db
+      - DB_USER=root
+      - DB_PASSWORD=${DB_ROOT_PASSWORD:-root_password}
+      - DB_PORT=3306
+    ports:
+      - "3008:3008"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - hr-erp-network
+    restart: unless-stopped
+
+  # Reporting Service (3009)
+  reporting-service:
+    build:
+      context: ./services/reporting-service
+      dockerfile: Dockerfile
+    container_name: hr-erp-reporting
+    env_file:
+      - ./services/reporting-service/.env
+    environment:
+      - DB_HOST=mysql
+      - PORT=3009
+      - DB_NAME=reporting_db
+      - DB_USER=root
+      - DB_PASSWORD=${DB_ROOT_PASSWORD:-root_password}
+      - DB_PORT=3306
+    ports:
+      - "3009:3009"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - hr-erp-network
+    restart: unless-stopped
+
   # Frontend
   frontend:
     build:
@@ -72,6 +225,13 @@ services:
     depends_on:
       - auth-service
       - recruitment-service
+      - employee-service
+      - leave-service
+      - attendance-service
+      - org-structure-service
+      - training-service
+      - benefits-service
+      # - reporting-service # Optional, if frontend uses it
     networks:
       - hr-erp-network
     restart: unless-stopped
