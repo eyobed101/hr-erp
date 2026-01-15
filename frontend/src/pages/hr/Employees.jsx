@@ -1,5 +1,5 @@
 ﻿// Employees.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -19,17 +19,30 @@ import {
   DialogContent,
   DialogActions,
   MenuItem,
+  FormControl,
+  InputLabel,
+  Select,
+  CircularProgress,
+  Alert
 } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
-import axios from 'axios';
+import { authAPI, employeeAPI, organizationAPI } from '../../services/api';
 
 export default function Employees() {
+  const [users, setUsers] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [positions, setPositions] = useState([]);
+  const [allUsersForDropdown, setAllUsersForDropdown] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+  const [loadingDropdown, setLoadingDropdown] = useState(false);
+  const [error, setError] = useState(null);
+
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalUsers, setTotalUsers] = useState(0);
 
   const [openDialog, setOpenDialog] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState(null);
@@ -42,44 +55,61 @@ export default function Employees() {
     manager_id: '',
   });
 
+  // Fetch support data only once on mount
   useEffect(() => {
-    fetchEmployees();
-    fetchDepartments();
-    fetchPositions();
+    fetchSupportData();
   }, []);
 
-  // Fetch employees
-  const fetchEmployees = async () => {
+  // Fetch main list whenever pagination or search changes
+  useEffect(() => {
+    fetchMainData();
+  }, [page, rowsPerPage, search]);
+
+  const fetchMainData = async () => {
+    setLoading(true);
     try {
-      const res = await axios.get('http://localhost:5000/employees');
-      setEmployees(res.data);
-    } catch (error) {
-      console.error('Error fetching employees:', error);
+      const userRes = await authAPI.getUsers({
+        page: page + 1,
+        limit: rowsPerPage,
+        search
+      });
+      setUsers(userRes.data.users || []);
+      setTotalUsers(userRes.data.pagination?.total || 0);
+
+      const empRes = await employeeAPI.getEmployees();
+      setEmployees(empRes.data || []);
+      setError(null);
+    } catch (err) {
+      console.error('Error fetching main data:', err);
+      setError('Failed to load employee data. Please check services.');
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Fetch departments
-  const fetchDepartments = async () => {
+  const fetchSupportData = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/departments');
-      setDepartments(res.data);
-    } catch (error) {
-      console.error('Error fetching departments:', error);
+      // Fetch individually so one failure doesn't block others
+      organizationAPI.getDepartments().then(res => setDepartments(res.data || [])).catch(e => console.error('Depts failed:', e));
+      employeeAPI.getPositions().then(res => setPositions(res.data || [])).catch(e => console.error('Positions failed:', e));
+    } catch (err) {
+      console.error('Support data fetch failed:', err);
     }
   };
 
-  // Fetch positions from backend
-  const fetchPositions = async () => {
+  const fetchAllUsersForDropdown = async () => {
+    setLoadingDropdown(true);
     try {
-      const res = await axios.get('http://localhost:5000/positions');
-      // Assuming backend returns [{ id, position_name }, ...]
-      setPositions(res.data);
-    } catch (error) {
-      console.error('Error fetching positions:', error);
+      const res = await authAPI.getUsers({ limit: 1000 });
+      setAllUsersForDropdown(res.data.users || []);
+    } catch (err) {
+      console.error('Error fetching users for dropdown:', err);
+    } finally {
+      setLoadingDropdown(false);
     }
   };
 
-  // Pagination & search
+  // Pagination & Search
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
     setPage(0);
@@ -91,227 +121,272 @@ export default function Employees() {
   };
 
   // Dialog handlers
-  const handleOpenDialog = (employee = null) => {
-    setEditingEmployee(employee);
-    setFormEmployee(
-      employee || {
+  const handleOpenDialog = async (employeeData = null) => {
+    fetchAllUsersForDropdown();
+    // Re-verify support data if empty
+    if (departments.length === 0 || positions.length === 0) {
+      fetchSupportData();
+    }
+
+    if (employeeData) {
+      setEditingEmployee(employeeData);
+      setFormEmployee({
+        user_id: employeeData.user_id || '',
+        employee_code: employeeData.employee_code || '',
+        hire_date: employeeData.hire_date || '',
+        department_id: employeeData.department_id || '',
+        position_id: employeeData.position_id || '',
+        manager_id: employeeData.manager_id || '',
+      });
+    } else {
+      setEditingEmployee(null);
+      setFormEmployee({
         user_id: '',
         employee_code: '',
         hire_date: '',
         department_id: '',
         position_id: '',
         manager_id: '',
-      }
-    );
+      });
+    }
     setOpenDialog(true);
   };
+
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setEditingEmployee(null);
-    setFormEmployee({
-      user_id: '',
-      employee_code: '',
-      hire_date: '',
-      department_id: '',
-      position_id: '',
-      manager_id: '',
-    });
   };
+
   const handleInputChange = (e) => {
     setFormEmployee({ ...formEmployee, [e.target.name]: e.target.value });
   };
 
-  // Add or update employee
   const handleSaveEmployee = async () => {
     try {
-      if (
-        !formEmployee.employee_code ||
-        !formEmployee.hire_date ||
-        !formEmployee.department_id ||
-        !formEmployee.position_id
-      ) {
-        alert('Employee code, hire date, department, and position are required!');
+      if (!formEmployee.user_id || !formEmployee.employee_code) {
+        alert('User and Employee Code are required!');
         return;
       }
 
-      if (editingEmployee) {
-        const res = await axios.put(
-          `http://localhost:5000/employees/${editingEmployee.id}`,
-          formEmployee
-        );
-        setEmployees(
-          employees.map((emp) => (emp.id === editingEmployee.id ? res.data : emp))
-        );
+      // Check if employee profile already exists for this user
+      const existingEmp = employees.find(e => e.user_id === formEmployee.user_id);
+
+      if (editingEmployee?.employee_id || existingEmp) {
+        const targetId = editingEmployee?.employee_id || existingEmp.id;
+        await employeeAPI.updateEmployee(targetId, formEmployee);
       } else {
-        const res = await axios.post('http://localhost:5000/employees', formEmployee);
-        setEmployees([...employees, res.data]);
+        await employeeAPI.createEmployee(formEmployee);
       }
+
       handleCloseDialog();
-    } catch (error) {
-      console.error('Error saving employee:', error);
+      fetchMainData();
+    } catch (err) {
+      console.error('Error saving employee:', err);
+      alert('Error saving data: ' + (err.response?.data?.message || err.message));
     }
   };
 
-  // Delete employee
-  const handleDeleteEmployee = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this employee?')) return;
+  const handleDeleteEmployee = async (userId) => {
+    const emp = employees.find(e => e.user_id === userId);
+    if (!emp) return;
+
+    if (!window.confirm('Are you sure you want to delete this employee profile?')) return;
     try {
-      await axios.delete(`http://localhost:5000/employees/${id}`);
-      setEmployees(employees.filter((emp) => emp.id !== id));
-    } catch (error) {
-      console.error('Error deleting employee:', error);
+      await employeeAPI.deleteEmployee(emp.id);
+      fetchMainData();
+    } catch (err) {
+      console.error('Error deleting employee:', err);
     }
   };
 
-  // Filtered employees
-  const filteredEmployees = employees.filter((emp) =>
-    emp.employee_code.toLowerCase().includes(search.toLowerCase())
-  );
+  // Helper to merge data for the table
+  const displayRows = users.map(user => {
+    const emp = employees.find(e => e.user_id === user.id) || {};
+    return {
+      ...user,
+      ...emp,
+      id: user.id, // Ensure we use user.id as key
+      employee_id: emp.id // Actual employee profile ID
+    };
+  });
 
   return (
     <Box p={3}>
-      <Typography variant="h4" mb={2}>
-        Employees
+      <Typography variant="h4" mb={2} fontWeight="bold" color="primary">
+        Employee Management
       </Typography>
+
+      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
       <Box mb={2} display="flex" justifyContent="space-between" alignItems="center">
         <TextField
-          label="Search employees"
+          label="Search People (Auth Service)"
           variant="outlined"
           size="small"
           value={search}
           onChange={handleSearchChange}
+          sx={{ width: 300 }}
         />
         <Button variant="contained" color="primary" onClick={() => handleOpenDialog()}>
-          Add Employee
+          Add/Assign Employee
         </Button>
       </Box>
 
       {/* Add/Edit Employee Dialog */}
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingEmployee ? 'Edit Employee' : 'Add Employee'}</DialogTitle>
-        <DialogContent>
-          <TextField
-            margin="dense"
-            label="Employee Code"
-            name="employee_code"
-            fullWidth
-            value={formEmployee.employee_code}
-            onChange={handleInputChange}
-          />
-          <TextField
-            margin="dense"
-            label="Hire Date"
-            type="date"
-            name="hire_date"
-            fullWidth
-            InputLabelProps={{ shrink: true }}
-            value={formEmployee.hire_date}
-            onChange={handleInputChange}
-          />
-          <TextField
-            margin="dense"
-            label="Department"
-            name="department_id"
-            select
-            fullWidth
-            value={formEmployee.department_id}
-            onChange={handleInputChange}
-          >
-            {departments.map((dept) => (
-              <MenuItem key={dept.id} value={dept.id}>
-                {dept.name}
-              </MenuItem>
-            ))}
-          </TextField>
-          <TextField
-            margin="dense"
-            label="Position"
-            name="position_id"
-            select
-            fullWidth
-            value={formEmployee.position_id}
-            onChange={handleInputChange}
-          >
-            {positions.map((pos) => (
-              <MenuItem key={pos.id} value={pos.id}>
-                {pos.position_name} {/* changed from pos.name to pos.position_name */}
-              </MenuItem>
-            ))}
-          </TextField>
-          <TextField
-            margin="dense"
-            label="Manager"
-            name="manager_id"
-            select
-            fullWidth
-            value={formEmployee.manager_id || ''}
-            onChange={handleInputChange}
-          >
-            <MenuItem value="">None</MenuItem>
-            {employees.map((emp) => (
-              <MenuItem key={emp.id} value={emp.id}>
-                {emp.employee_code} - {emp.user_id}
-              </MenuItem>
-            ))}
-          </TextField>
+        <DialogTitle>{editingEmployee ? 'Update Employee Profile' : 'Assign Employee Profile'}</DialogTitle>
+        <DialogContent sx={{ mt: 1 }}>
+          {loadingDropdown ? (
+            <Box display="flex" justifyContent="center" p={3}><CircularProgress /></Box>
+          ) : (
+            <>
+              <TextField
+                margin="dense"
+                label="Select User"
+                name="user_id"
+                select
+                fullWidth
+                value={formEmployee.user_id}
+                onChange={handleInputChange}
+                disabled={!!editingEmployee}
+              >
+                {allUsersForDropdown.map((u) => (
+                  <MenuItem key={u.id} value={u.id}>
+                    {u.first_name} {u.last_name} ({u.email})
+                  </MenuItem>
+                ))}
+              </TextField>
+
+              <TextField
+                margin="dense"
+                label="Employee Code"
+                name="employee_code"
+                fullWidth
+                value={formEmployee.employee_code}
+                onChange={handleInputChange}
+              />
+              <TextField
+                margin="dense"
+                label="Hire Date"
+                type="date"
+                name="hire_date"
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+                value={formEmployee.hire_date}
+                onChange={handleInputChange}
+              />
+
+              <TextField
+                margin="dense"
+                label="Department"
+                name="department_id"
+                select
+                fullWidth
+                value={formEmployee.department_id}
+                onChange={handleInputChange}
+              >
+                {departments.length === 0 && <MenuItem disabled>No departments loaded</MenuItem>}
+                {departments.map((dept) => (
+                  <MenuItem key={dept.id} value={dept.id}>
+                    {dept.departmentName}
+                  </MenuItem>
+                ))}
+              </TextField>
+
+              <TextField
+                margin="dense"
+                label="Position"
+                name="position_id"
+                select
+                fullWidth
+                value={formEmployee.position_id}
+                onChange={handleInputChange}
+              >
+                {positions.length === 0 && <MenuItem disabled>No positions loaded</MenuItem>}
+                {positions.map((pos) => (
+                  <MenuItem key={pos.id} value={pos.id}>
+                    {pos.position_name}
+                  </MenuItem>
+                ))}
+              </TextField>
+
+              <TextField
+                margin="dense"
+                label="Manager"
+                name="manager_id"
+                select
+                fullWidth
+                value={formEmployee.manager_id}
+                onChange={handleInputChange}
+              >
+                <MenuItem value="">None</MenuItem>
+                {employees.map((emp) => (
+                  <MenuItem key={emp.id} value={emp.id}>
+                    {emp.employee_code}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog}>Cancel</Button>
-          <Button variant="contained" color="primary" onClick={handleSaveEmployee}>
-            {editingEmployee ? 'Update' : 'Add'}
+          <Button variant="contained" color="primary" onClick={handleSaveEmployee} disabled={loadingDropdown}>
+            {editingEmployee ? 'Update' : 'Save'}
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Employees Table */}
-      <Paper>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>Employee Code</TableCell>
-                <TableCell>Hire Date</TableCell>
-                <TableCell>Department</TableCell>
-                <TableCell>Position</TableCell>
-                <TableCell>Manager</TableCell>
-                <TableCell>Created At</TableCell>
-                <TableCell>Updated At</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredEmployees
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((emp) => (
-                  <TableRow key={emp.id}>
-                    <TableCell>{emp.id}</TableCell>
-                    <TableCell>{emp.employee_code}</TableCell>
-                    <TableCell>{emp.hire_date}</TableCell>
-                    <TableCell>{emp.department_id}</TableCell>
+      <Paper elevation={3} sx={{ borderRadius: 2, overflow: 'hidden' }}>
+        <TableContainer sx={{ minHeight: 400 }}>
+          {loading ? (
+            <Box display="flex" justifyContent="center" alignItems="center" height={400}><CircularProgress /></Box>
+          ) : (
+            <Table>
+              <TableHead sx={{ bgcolor: 'grey.100' }}>
+                <TableRow>
+                  <TableCell><b>Name</b></TableCell>
+                  <TableCell><b>Email</b></TableCell>
+                  <TableCell><b>Code</b></TableCell>
+                  <TableCell><b>Department</b></TableCell>
+                  <TableCell><b>Position</b></TableCell>
+                  <TableCell><b>Hire Date</b></TableCell>
+                  <TableCell align="center"><b>Actions</b></TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {displayRows.map((row) => (
+                  <TableRow key={row.id} hover>
+                    <TableCell>{row.first_name} {row.last_name}</TableCell>
+                    <TableCell>{row.email}</TableCell>
+                    <TableCell>{row.employee_code || <Typography variant="caption" color="textSecondary">Not Assigned</Typography>}</TableCell>
                     <TableCell>
-                      {positions.find((p) => p.id === emp.position_id)?.position_name || ''}
+                      {departments.find((d) => d.id === row.department_id)?.departmentName || row.department_id || '-'}
                     </TableCell>
-                    <TableCell>{emp.manager_id}</TableCell>
-                    <TableCell>{emp.created_at}</TableCell>
-                    <TableCell>{emp.updated_at}</TableCell>
                     <TableCell>
-                      <IconButton color="primary" onClick={() => handleOpenDialog(emp)}>
+                      {positions.find((p) => p.id === row.position_id)?.position_name || row.position_id || '-'}
+                    </TableCell>
+                    <TableCell>{row.hire_date ? new Date(row.hire_date).toLocaleDateString() : '-'}</TableCell>
+                    <TableCell align="center">
+                      <IconButton color="primary" onClick={() => handleOpenDialog(row)}>
                         <Edit />
                       </IconButton>
-                      <IconButton color="error" onClick={() => handleDeleteEmployee(emp.id)}>
-                        <Delete />
-                      </IconButton>
+                      {row.employee_id && (
+                        <IconButton color="error" onClick={() => handleDeleteEmployee(row.id)}>
+                          <Delete />
+                        </IconButton>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}
-            </TableBody>
-          </Table>
+              </TableBody>
+            </Table>
+          )}
         </TableContainer>
         <TablePagination
           component="div"
-          count={filteredEmployees.length}
+          count={totalUsers}
           page={page}
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}
