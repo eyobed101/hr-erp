@@ -168,14 +168,22 @@ export default function Employees() {
         return;
       }
 
+      // Transform empty strings to null for database compatibility
+      const submissionData = {
+        ...formEmployee,
+        department_id: formEmployee.department_id || null,
+        position_id: formEmployee.position_id || null,
+        manager_id: formEmployee.manager_id || null,
+      };
+
       // Check if employee profile already exists for this user
       const existingEmp = employees.find(e => e.user_id === formEmployee.user_id);
 
       if (editingEmployee?.employee_id || existingEmp) {
         const targetId = editingEmployee?.employee_id || existingEmp.id;
-        await employeeAPI.updateEmployee(targetId, formEmployee);
+        await employeeAPI.updateEmployee(targetId, submissionData);
       } else {
-        await employeeAPI.createEmployee(formEmployee);
+        await employeeAPI.createEmployee(submissionData);
       }
 
       handleCloseDialog();
