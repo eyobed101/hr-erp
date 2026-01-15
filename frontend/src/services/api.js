@@ -99,7 +99,8 @@ export const recruitmentAPI = {
 };
 
 export const leaveAPI = {
-    getLeaves: (params) => leaveService.get('leave', { params }),
+    getLeaves: (params) => leaveService.get('leave/getAllPending', { params }),
+    getLeaveBalances: () => leaveService.get('leave/getEmployeesBalance'),
     getMyLeaves: () => leaveService.get('leave/my'),
     getLeave: (id) => leaveService.get(`leave/${id}`),
     createLeave: (data) => leaveService.post('leave', data),

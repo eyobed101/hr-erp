@@ -2,6 +2,7 @@
 //     id              INT AUTO_INCREMENT PRIMARY KEY,
 //     employee_id     INT NOT NULL,
 //     leave_type      ENUM('annual', 'sick', 'unpaid', 'maternity', 'other') NOT NULL,
+//     allowed_days    INT NOT NULL DEFAULT 30,
 //     balance_days    DECIMAL(5,2) DEFAULT 0.00,
 //     accrued_days    DECIMAL(5,2) DEFAULT 0.00,
 //     year            INT NOT NULL,                      -- e.g., 2026
@@ -37,6 +38,12 @@ const LeaveBalance = sequelize.define(
         "other"
       ),
       allowNull: false,
+    },
+
+    allowed_days: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 30,
     },
 
     balance_days: {
