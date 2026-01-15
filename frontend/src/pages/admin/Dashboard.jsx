@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
     Box,
-    Grid,
     Paper,
     Typography,
     Card,
@@ -188,93 +187,81 @@ const AdminDashboard = () => {
     };
 
     return (
-        <Box sx={{ p: { xs: 2, md: 4 }, width: '100%', margin: '0 auto' }}>
-            <Box sx={{ mb: 4 }}>
-                <Typography variant="h4" fontWeight="800" color="text.primary">
-                    Admin Overview
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                    Real-time metrics from across the ERP system
-                </Typography>
-            </Box>
+        <div className="p-4 md:p-6">
+            {/* Header Section */}
+            <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-8">
+                <Box>
+                    <Typography variant="h4" fontWeight="800" color="text.primary" sx={{ fontSize: { xs: '1.5rem', md: '1.875rem' } }}>
+                        Admin Overview
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                        Real-time metrics from across the ERP system
+                    </Typography>
+                </Box>
+                {/* Future actions/filters can go here */}
+            </div>
 
-            {/* Metrics Row */}
-            <Grid container spacing={3} sx={{ mb: 4 }}>
-                <Grid item xs={12} sm={6} md={3}>
-                    <MetricCard
-                        title="Total Users"
-                        value={stats.auth?.totalUsers || 0}
-                        icon={PeopleIcon}
-                        color="#3b82f6"
-                        trend="+12% from last week"
-                    />
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                    <MetricCard
-                        title="Active Jobs"
-                        value={stats.recruitment?.totalJobs || 0}
-                        icon={WorkIcon}
-                        color="#8b5cf6"
-                    />
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                    <MetricCard
-                        title="Available Courses"
-                        value={stats.training?.totalCourses || 0}
-                        icon={SchoolIcon}
-                        color="#10b981"
-                    />
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                    <MetricCard
-                        title="Total Applications"
-                        value={stats.recruitment?.totalApplications || 0}
-                        icon={AssignmentIcon}
-                        color="#f59e0b"
-                    />
-                </Grid>
-            </Grid>
+            {/* Metrics Section */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <MetricCard
+                    title="Total Users"
+                    value={stats.auth?.totalUsers || 0}
+                    icon={PeopleIcon}
+                    color="#3b82f6"
+                    trend="+12% from last week"
+                />
+                <MetricCard
+                    title="Active Jobs"
+                    value={stats.recruitment?.totalJobs || 0}
+                    icon={WorkIcon}
+                    color="#8b5cf6"
+                />
+                <MetricCard
+                    title="Available Courses"
+                    value={stats.training?.totalCourses || 0}
+                    icon={SchoolIcon}
+                    color="#10b981"
+                />
+                <MetricCard
+                    title="Total Applications"
+                    value={stats.recruitment?.totalApplications || 0}
+                    icon={AssignmentIcon}
+                    color="#f59e0b"
+                />
+            </div>
 
-            {/* Charts Row 1 */}
-            <Grid container spacing={3} sx={{ mb: 4 }}>
-                <Grid item xs={12} md={8}>
-                    <Paper elevation={0} sx={{ p: 3, borderRadius: 4, border: '1px solid', borderColor: 'divider' }}>
-                        <Typography variant="h6" fontWeight="700" sx={{ mb: 2 }}>User Registration Trend</Typography>
-                        <Box sx={{ height: 300 }}>
-                            <Line data={registrationTrendData} options={{ maintainAspectRatio: false }} />
-                        </Box>
-                    </Paper>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                    <Paper elevation={0} sx={{ p: 3, borderRadius: 4, border: '1px solid', borderColor: 'divider' }}>
-                        <Typography variant="h6" fontWeight="700" sx={{ mb: 2 }}>Role Distribution</Typography>
-                        <Box sx={{ height: 300, display: 'flex', justifyContent: 'center' }}>
-                            <Doughnut data={roleDistData} options={{ maintainAspectRatio: false }} />
-                        </Box>
-                    </Paper>
-                </Grid>
-            </Grid>
+            {/* Analytics Section - Row 1 */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <Card className="lg:col-span-2" elevation={0} sx={{ p: 3, borderRadius: 4, border: '1px solid', borderColor: 'divider' }}>
+                    <Typography variant="h6" fontWeight="700" sx={{ mb: 2 }}>User Registration Trend</Typography>
+                    <Box sx={{ height: 300 }}>
+                        <Line data={registrationTrendData} options={{ maintainAspectRatio: false }} />
+                    </Box>
+                </Card>
+                <Card elevation={0} sx={{ p: 3, borderRadius: 4, border: '1px solid', borderColor: 'divider' }}>
+                    <Typography variant="h6" fontWeight="700" sx={{ mb: 2 }}>Role Distribution</Typography>
+                    <Box sx={{ height: 300, display: 'flex', justifyContent: 'center' }}>
+                        <Doughnut data={roleDistData} options={{ maintainAspectRatio: false }} />
+                    </Box>
+                </Card>
+            </div>
 
-            {/* Charts Row 2 */}
-            <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
-                    <Paper elevation={0} sx={{ p: 3, borderRadius: 4, border: '1px solid', borderColor: 'divider' }}>
-                        <Typography variant="h6" fontWeight="700" sx={{ mb: 2 }}>Recruitment Funnel</Typography>
-                        <Box sx={{ height: 300 }}>
-                            <Bar data={applicationStageData} options={{ maintainAspectRatio: false }} />
-                        </Box>
-                    </Paper>
-                </Grid>
-                <Grid item xs={12} md={6}>
-                    <Paper elevation={0} sx={{ p: 3, borderRadius: 4, border: '1px solid', borderColor: 'divider' }}>
-                        <Typography variant="h6" fontWeight="700" sx={{ mb: 2 }}>Training Enrollment Trend</Typography>
-                        <Box sx={{ height: 300 }}>
-                            <Line data={enrollmentTrendData} options={{ maintainAspectRatio: false }} />
-                        </Box>
-                    </Paper>
-                </Grid>
-            </Grid>
-        </Box>
+            {/* Analytics Section - Row 2 */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card elevation={0} sx={{ p: 3, borderRadius: 4, border: '1px solid', borderColor: 'divider' }}>
+                    <Typography variant="h6" fontWeight="700" sx={{ mb: 2 }}>Recruitment Funnel</Typography>
+                    <Box sx={{ height: 300 }}>
+                        <Bar data={applicationStageData} options={{ maintainAspectRatio: false }} />
+                    </Box>
+                </Card>
+                <Card elevation={0} sx={{ p: 3, borderRadius: 4, border: '1px solid', borderColor: 'divider' }}>
+                    <Typography variant="h6" fontWeight="700" sx={{ mb: 2 }}>Training Enrollment Trend</Typography>
+                    <Box sx={{ height: 300 }}>
+                        <Line data={enrollmentTrendData} options={{ maintainAspectRatio: false }} />
+                    </Box>
+                </Card>
+            </div>
+        </div>
     );
 };
 
