@@ -18,6 +18,8 @@ export const NAVIGATION_CONFIG = {
         { path: '/admin/profile', label: 'My Profile', icon: 'profile' },
         { path: '/admin/users', label: 'User Management', icon: 'users' },
         { path: '/admin/departments', label: 'Departments', icon: 'departments' },
+        { path: '/admin/structure_change', label: 'Structure Change', icon: 'structure_change' },
+
         { path: '/admin/job-categories', label: 'Job Categories', icon: 'job-categories' },
         { path: '/admin/settings', label: 'Settings', icon: 'settings' },
         { path: '/admin/reports', label: 'Reports', icon: 'reports' },

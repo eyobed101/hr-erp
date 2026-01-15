@@ -36,6 +36,9 @@ import Attendance from '../pages/employee/Attendance';
 import EmployeeCourses from '../pages/employee/EmployeeCourses';
 import DepartmentManagement from '../pages/organization/DepartmentManagement';
 import JobCategoryManagement from '../pages/organization/JobCategoryManagement';
+import ChangeStructureManagement from '../pages/organization/ChangeStructureManagement';
+
+
 
 const AppRoutes = () => {
     const isAuthenticated = useSelector(selectIsAuthenticated);
@@ -45,7 +48,7 @@ const AppRoutes = () => {
         if (!isAuthenticated) return '/login';
         return `${ROLE_ROUTES[role]}/dashboard`;
     };
-                
+
 
     return (
         <Routes>
@@ -91,6 +94,8 @@ const AppRoutes = () => {
 
 
                 {/* NEW ORGANIZATION ROUTES */}
+                <Route path="/admin/structure_change" element={<RoleBasedRoute allowedRoles={[ROLES.ADMIN]}><ChangeStructureManagement /></RoleBasedRoute>} />
+
                 <Route path="/admin/departments" element={<RoleBasedRoute allowedRoles={[ROLES.ADMIN]}><DepartmentManagement /></RoleBasedRoute>} />
                 <Route path="/admin/job-categories" element={<RoleBasedRoute allowedRoles={[ROLES.ADMIN]}><JobCategoryManagement /></RoleBasedRoute>} />
             </Route>
