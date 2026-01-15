@@ -21,6 +21,7 @@ export const NAVIGATION_CONFIG = {
         { path: '/admin/structure_change', label: 'Structure Change', icon: 'structure_change' },
 
         { path: '/admin/job-categories', label: 'Job Categories', icon: 'job-categories' },
+        { path: '/admin/training', label: 'Training Management', icon: 'courses' },
         { path: '/admin/settings', label: 'Settings', icon: 'settings' },
         { path: '/admin/reports', label: 'Reports', icon: 'reports' },
     ],
@@ -28,6 +29,7 @@ export const NAVIGATION_CONFIG = {
         { path: '/hr/dashboard', label: 'Dashboard', icon: 'dashboard' },
         { path: '/hr/profile', label: 'My Profile', icon: 'profile' },
         { path: '/hr/employees', label: 'Employees', icon: 'users' },
+        { path: '/hr/training', label: 'Training Management', icon: 'courses' },
         { path: '/hr/recruitment', label: 'Recruitment', icon: 'recruitment' },
         { path: '/hr/leave', label: 'Leave Management', icon: 'leave' },
     ],

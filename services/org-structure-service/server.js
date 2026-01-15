@@ -5,7 +5,7 @@ const sequelize = require('./src/config/db');
 const initializeDatabase = require('./src/config/initDb');
 require('dotenv').config();
 const HOST = '127.0.0.1';
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3006;
 const departmentRoutes = require('./src/routes/departmentRoutes.js');
 const jobCategoryRoutes = require('./src/routes/jobCategoryRoutes.js');
 const benefitRoutes = require('./src/routes/benefitRoutes.js');
@@ -31,8 +31,8 @@ async function startServer() {
     await sequelize.sync({ alter: true });
     console.log('Database synced successfully');
 
-    app.listen(PORT, HOST, () => {
-      console.log(`Organization Service running on http://${HOST}:${PORT}`);
+    app.listen(PORT, () => {
+      console.log(`Organization Service running on port ${PORT}`);
     });
   } catch (error) {
     console.error('Unable to start server:', error);

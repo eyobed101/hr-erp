@@ -73,7 +73,7 @@ services:
       - DB_HOST=mysql
       - DB_DIALECT=mysql
     ports:
-      - "3002:3002"
+      - "3001:3002"
     depends_on:
       mysql:
         condition: service_healthy

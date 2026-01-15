@@ -8,12 +8,12 @@ const app = express();
 
 import leaveRoutes from './src/routes/leaveRoutes.js';
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3003;
 const HOST = process.env.HOST || "localhost";
 
 app.use(express.json());
 app.use(cors());
-app.use('/api/leave', leaveRoutes);
+app.use('/', leaveRoutes);
 
 app.get("/", (_req, res) => {
   res.send({ message: 'leave service is running' });
