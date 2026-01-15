@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 const jobCategoryController = require('../controllers/jobCategoryController');
 
-router.post('/', jobCategoryController.createJobCategory);
+const auth = require('../middleware/authMiddleware');
+
+router.post('/', auth, jobCategoryController.createJobCategory);
 router.get('/', jobCategoryController.getJobCategories);
 router.get('/:id', jobCategoryController.getJobCategoryById);
 router.put('/:id', jobCategoryController.updateJobCategory);

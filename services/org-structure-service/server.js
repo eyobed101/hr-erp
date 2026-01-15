@@ -4,7 +4,7 @@ const cors = require('cors');
 const sequelize = require('./src/config/db');
 const initializeDatabase = require('./src/config/initDb');
 require('dotenv').config();
-const HOST = '127.0.0.1';
+const HOST = '0.0.0.0';
 const PORT = process.env.PORT || 3001;
 const departmentRoutes = require('./src/routes/departmentRoutes.js');
 const jobCategoryRoutes = require('./src/routes/jobCategoryRoutes.js');
