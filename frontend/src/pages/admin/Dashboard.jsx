@@ -188,7 +188,7 @@ const AdminDashboard = () => {
     };
 
     return (
-        <Box sx={{ p: { xs: 2, md: 4 }, maxWidth: 1600, margin: '0 auto' }}>
+        <Box sx={{ p: { xs: 2, md: 4 }, width: '100%', margin: '0 auto' }}>
             <Box sx={{ mb: 4 }}>
                 <Typography variant="h4" fontWeight="800" color="text.primary">
                     Admin Overview
