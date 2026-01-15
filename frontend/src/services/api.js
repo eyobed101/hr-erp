@@ -160,7 +160,7 @@ export const trainingAPI = {
     updateQuiz: (id, data) => trainingService.put(`quizzes/${id}`, data),
     deleteQuiz: (id) => trainingService.delete(`quizzes/${id}`),
     getQuizAttemptsCount: (quizId) => trainingService.get(`quizzes/${quizId}/attempts/count`),
-    submitQuiz: (quizId, data) => trainingService.post(`quizzes/${quizId}/attempt`),
+    submitQuiz: (quizId, data) => trainingService.post(`quizzes/${quizId}/attempt`, data),
     getMyAttempts: () => trainingService.get('quizzes/attempts/my'),
 
     // Question actions
