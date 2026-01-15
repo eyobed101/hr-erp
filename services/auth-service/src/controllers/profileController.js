@@ -87,9 +87,26 @@ exports.updateProfile = async (req, res) => {
             bio
         } = req.body;
 
-        const profile = await Profile.findOne({ where: { user_id: userId } });
+        let profile = await Profile.findOne({ where: { user_id: userId } });
+
         if (!profile) {
-            return res.status(404).json({ message: 'Profile not found' });
+            // Profile not found, create new one
+            profile = await Profile.create({
+                user_id: userId,
+                date_of_birth,
+                gender,
+                address,
+                city,
+                state,
+                country,
+                postal_code,
+                emergency_contact_name,
+                emergency_contact_phone,
+                emergency_contact_relationship,
+                profile_picture_url,
+                bio
+            });
+            return res.status(201).json({ message: 'Profile created successfully', profile });
         }
 
         await profile.update({
