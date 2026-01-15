@@ -73,7 +73,7 @@ services:
       - DB_HOST=mysql
       - DB_DIALECT=mysql
     ports:
-      - "3001:3002"
+      - "3002:3002"
     depends_on:
       mysql:
         condition: service_healthy
@@ -116,9 +116,9 @@ services:
       - ./services/attendance-service/.env
     environment:
       - DB_HOST=mysql
-      - PORT=3005
+      - PORT=3004
     ports:
-      - "3005:3005"
+      - "3004:3004"
     depends_on:
       mysql:
         condition: service_healthy
