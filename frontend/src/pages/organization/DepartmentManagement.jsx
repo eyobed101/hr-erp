@@ -1,29 +1,21 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Added
 import {
-    Box,
-    Button,
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    TablePagination,
-    IconButton,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    TextField,
-    MenuItem,
-    CircularProgress,
-    Alert,
+    Box, Button, Paper, Table, TableBody, TableCell, TableContainer,
+    TableHead, TableRow, TablePagination, IconButton, Dialog,
+    DialogTitle, DialogContent, DialogActions, TextField, MenuItem,
+    CircularProgress, Alert, Tooltip // Added Tooltip
 } from '@mui/material';
-import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import {
+    Add as AddIcon,
+    Edit as EditIcon,
+    Delete as DeleteIcon,
+    AccountTree as StructureIcon // Added StructureIcon
+} from '@mui/icons-material';
 import { organizationAPI } from '../../services/api';
 
 const DepartmentManagement = () => {
+    const navigate = useNavigate();
     const [departments, setDepartments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(0);
@@ -48,23 +40,12 @@ const DepartmentManagement = () => {
         try {
             setLoading(true);
             const response = await organizationAPI.getDepartments();
-            // Assuming the backend returns an array directly or inside a data property
             setDepartments(Array.isArray(response.data) ? response.data : []);
         } catch (err) {
             setError('Failed to fetch departments');
-            console.error(err);
         } finally {
             setLoading(false);
         }
-    };
-
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-    };
-
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
     };
 
     const handleOpenModal = (dept = null) => {
@@ -92,23 +73,13 @@ const DepartmentManagement = () => {
     };
 
     const handleInputChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
+        setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
-        setSuccess('');
-
         try {
-            const payload = {
-                ...formData,
-                parentDepartmentId: formData.parentDepartmentId || null
-            };
-
+            const payload = { ...formData, parentDepartmentId: formData.parentDepartmentId || null };
             if (isEdit) {
                 await organizationAPI.updateDepartment(selectedId, payload);
                 setSuccess('Department updated successfully!');
@@ -116,7 +87,6 @@ const DepartmentManagement = () => {
                 await organizationAPI.createDepartment(payload);
                 setSuccess('Department created successfully!');
             }
-
             setTimeout(() => {
                 handleCloseModal();
                 fetchDepartments();
@@ -148,11 +118,7 @@ const DepartmentManagement = () => {
                     variant="contained"
                     startIcon={<AddIcon />}
                     onClick={() => handleOpenModal()}
-                    fullWidth
-                    sx={{
-                        background: 'linear-gradient(to right, #10b981, #3b82f6)',
-                        '@media (min-width: 640px)': { width: 'auto' },
-                    }}
+                    sx={{ background: 'linear-gradient(to right, #10b981, #3b82f6)' }}
                 >
                     Add Department
                 </Button>
@@ -164,117 +130,70 @@ const DepartmentManagement = () => {
                         <TableHead>
                             <TableRow sx={{ backgroundColor: '#f9fafb' }}>
                                 <TableCell sx={{ fontWeight: 600 }}>Department Name</TableCell>
-                                <TableCell sx={{ fontWeight: 600 }}>Description</TableCell>
                                 <TableCell sx={{ fontWeight: 600 }}>Parent Dept</TableCell>
                                 <TableCell sx={{ fontWeight: 600 }} align="right">Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {loading ? (
-                                <TableRow>
-                                    <TableCell colSpan={4} align="center" sx={{ py: 8 }}>
-                                        <CircularProgress />
-                                    </TableCell>
-                                </TableRow>
+                                <TableRow><TableCell colSpan={3} align="center" sx={{ py: 8 }}><CircularProgress /></TableCell></TableRow>
                             ) : departments.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={4} align="center" sx={{ py: 8 }}>
-                                        <p className="text-gray-500">No departments found.</p>
-                                    </TableCell>
-                                </TableRow>
+                                <TableRow><TableCell colSpan={3} align="center" sx={{ py: 8 }}>No departments found.</TableCell></TableRow>
                             ) : (
-                                departments
-                                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                    .map((dept) => (
-                                        <TableRow key={dept.id} hover>
-                                            <TableCell sx={{ fontWeight: 500 }}>{dept.departmentName}</TableCell>
-                                            <TableCell>{dept.description || '-'}</TableCell>
-                                            <TableCell>
-                                                {departments.find(d => d.id === dept.parentDepartmentId)?.departmentName || 'None'}
-                                            </TableCell>
-                                            <TableCell align="right">
-                                                <IconButton size="small" color="primary" onClick={() => handleOpenModal(dept)}>
-                                                    <EditIcon fontSize="small" />
+                                departments.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((dept) => (
+                                    <TableRow key={dept.id} hover>
+                                        <TableCell sx={{ fontWeight: 500 }}>{dept.departmentName}</TableCell>
+                                        <TableCell>
+                                            {departments.find(d => d.id === dept.parentDepartmentId)?.departmentName || 'None'}
+                                        </TableCell>
+                                        <TableCell align="right">
+                                            {/* MOVE/STRUCTURE ACTION */}
+                                            <Tooltip title="Change Structure / Move">
+                                                <IconButton
+                                                    size="small"
+                                                    sx={{ color: '#8b5cf6', mr: 1 }}
+                                                    onClick={() => navigate('/admin/structure_change', { state: { id: dept.id } })}
+                                                >
+                                                    <StructureIcon fontSize="small" />
                                                 </IconButton>
-                                                <IconButton size="small" color="error" onClick={() => handleDelete(dept.id)}>
-                                                    <DeleteIcon fontSize="small" />
-                                                </IconButton>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
+                                            </Tooltip>
+
+                                            <IconButton size="small" color="primary" onClick={() => handleOpenModal(dept)}>
+                                                <EditIcon fontSize="small" />
+                                            </IconButton>
+                                            <IconButton size="small" color="error" onClick={() => handleDelete(dept.id)}>
+                                                <DeleteIcon fontSize="small" />
+                                            </IconButton>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
                             )}
                         </TableBody>
                     </Table>
                 </TableContainer>
                 <TablePagination
-                    rowsPerPageOptions={[5, 10, 25]}
                     component="div"
                     count={departments.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
+                    onPageChange={(e, p) => setPage(p)}
                 />
             </Paper>
 
             <Dialog open={openModal} onClose={handleCloseModal} maxWidth="sm" fullWidth>
-                <DialogTitle>
-                    <span className="text-2xl font-bold">{isEdit ? 'Edit Department' : 'Create New Department'}</span>
-                </DialogTitle>
+                <DialogTitle>{isEdit ? 'Edit Department' : 'Create New Department'}</DialogTitle>
                 <form onSubmit={handleSubmit}>
                     <DialogContent>
                         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
                         {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
-
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, mt: 1 }}>
-                            <TextField
-                                fullWidth
-                                label="Department Name"
-                                name="departmentName"
-                                value={formData.departmentName}
-                                onChange={handleInputChange}
-                                required
-                            />
-
-                            <TextField
-                                fullWidth
-                                label="Description"
-                                name="description"
-                                multiline
-                                rows={3}
-                                value={formData.description}
-                                onChange={handleInputChange}
-                            />
-
-                            <TextField
-                                fullWidth
-                                select
-                                label="Parent Department"
-                                name="parentDepartmentId"
-                                value={formData.parentDepartmentId}
-                                onChange={handleInputChange}
-                                helperText="Optional: Select if this is a sub-department"
-                            >
-                                <MenuItem value=""><em>None (Root Level)</em></MenuItem>
-                                {departments
-                                    .filter(d => d.id !== selectedId) // Prevent self-parenting
-                                    .map((dept) => (
-                                        <MenuItem key={dept.id} value={dept.id}>
-                                            {dept.departmentName}
-                                        </MenuItem>
-                                    ))}
-                            </TextField>
+                            <TextField fullWidth label="Department Name" name="departmentName" value={formData.departmentName} onChange={handleInputChange} required />
+                            <TextField fullWidth label="Description" name="description" multiline rows={3} value={formData.description} onChange={handleInputChange} />
                         </Box>
                     </DialogContent>
                     <DialogActions sx={{ px: 3, pb: 3 }}>
-                        <Button onClick={handleCloseModal} color="inherit">Cancel</Button>
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            sx={{ background: 'linear-gradient(to right, #10b981, #3b82f6)' }}
-                        >
-                            {isEdit ? 'Update Department' : 'Create Department'}
-                        </Button>
+                        <Button onClick={handleCloseModal}>Cancel</Button>
+                        <Button type="submit" variant="contained" sx={{ background: 'linear-gradient(to right, #10b981, #3b82f6)' }}>Save</Button>
                     </DialogActions>
                 </form>
             </Dialog>

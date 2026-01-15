@@ -8,6 +8,7 @@ const HOST = '127.0.0.1';
 const PORT = process.env.PORT || 3006;
 const departmentRoutes = require('./src/routes/departmentRoutes.js');
 const jobCategoryRoutes = require('./src/routes/jobCategoryRoutes.js');
+const benefitRoutes = require('./src/routes/benefitRoutes.js');
 
 app.use(cors());
 app.use(express.json());
@@ -19,6 +20,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/organization/departments', departmentRoutes);
 app.use('/api/organization/job-categories', jobCategoryRoutes);
+app.use('/api/organization/benefits', benefitRoutes);
 
 async function startServer() {
   try {
