@@ -67,18 +67,18 @@ export const authAPI = {
 };
 
 export const profileAPI = {
-    getProfile: (userId) => authService.get(userId ? `/profile/${userId}` : '/profile/me'),
-    createProfile: (profileData) => authService.post('/profile', profileData),
-    updateProfile: (userId, profileData) => authService.put(`/profile/${userId}`, profileData),
-    deleteProfile: (userId) => authService.delete(`/profile/${userId}`),
+    getProfile: (userId) => authService.get(userId ? `profile/${userId}` : 'profile/me'),
+    createProfile: (profileData) => authService.post('profile', profileData),
+    updateProfile: (profileData) => authService.put('profile', profileData),
+    deleteProfile: () => authService.delete('profile'),
 };
 
 export const employeeAPI = {
-    getEmployees: () => employeeService.get('/employees'),
-    getEmployee: (id) => employeeService.get(`/employees/${id}`),
-    createEmployee: (data) => employeeService.post('/employees', data),
-    updateEmployee: (id, data) => employeeService.put(`/employees/${id}`, data),
-    deleteEmployee: (id) => employeeService.delete(`/employees/${id}`),
+    getEmployees: () => employeeService.get('employee'),
+    getEmployee: (id) => employeeService.get(`employee/${id}`),
+    createEmployee: (data) => employeeService.post('employee', data),
+    updateEmployee: (id, data) => employeeService.put(`employee/${id}`, data),
+    deleteEmployee: (id) => employeeService.delete(`employee/${id}`),
 };
 
 export const recruitmentAPI = {
@@ -118,9 +118,9 @@ export const organizationAPI = {
 };
 
 export const trainingAPI = {
-    getTrainings: (params) => trainingService.get('trainings', { params }),
-    getTraining: (id) => trainingService.get(`trainings/${id}`),
-    enrollTraining: (id) => trainingService.post(`trainings/${id}/enroll`),
+    getTrainings: (params) => trainingService.get('courses', { params }),
+    getTraining: (id) => trainingService.get(`courses/${id}`),
+    enrollTraining: (id) => trainingService.post(`courses/${id}/enroll`),
 };
 
 export const benefitsAPI = {

@@ -15,6 +15,7 @@ export const ROLE_ROUTES = {
 export const NAVIGATION_CONFIG = {
     [ROLES.ADMIN]: [
         { path: '/admin/dashboard', label: 'Dashboard', icon: 'dashboard' },
+        { path: '/admin/profile', label: 'My Profile', icon: 'profile' },
         { path: '/admin/users', label: 'User Management', icon: 'users' },
         { path: '/admin/training', label: 'Training', icon: 'reports' },
         { path: '/admin/settings', label: 'Settings', icon: 'settings' },
@@ -22,12 +23,14 @@ export const NAVIGATION_CONFIG = {
     ],
     [ROLES.HR]: [
         { path: '/hr/dashboard', label: 'Dashboard', icon: 'dashboard' },
+        { path: '/hr/profile', label: 'My Profile', icon: 'profile' },
         { path: '/hr/employees', label: 'Employees', icon: 'users' },
         { path: '/hr/recruitment', label: 'Recruitment', icon: 'recruitment' },
         { path: '/hr/leave', label: 'Leave Management', icon: 'leave' },
     ],
     [ROLES.MANAGER]: [
         { path: '/manager/dashboard', label: 'Dashboard', icon: 'dashboard' },
+        { path: '/manager/profile', label: 'My Profile', icon: 'profile' },
         { path: '/manager/team', label: 'My Team', icon: 'team' },
         { path: '/manager/approvals', label: 'Approvals', icon: 'approvals' },
         { path: '/manager/performance', label: 'Performance', icon: 'performance' },
