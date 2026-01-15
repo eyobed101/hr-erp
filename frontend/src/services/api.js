@@ -5,8 +5,8 @@ const API_BASE_URL = 'http://localhost';
 const createServiceInstance = (serviceName) => {
     const ports = {
         auth: 3000,
-        employee: 3001,
-        recruitment: 3002,
+        employee: 3002,
+        recruitment: 3001,
         leave: 3003,
         attendance: 3005,
         organization: 3006,
