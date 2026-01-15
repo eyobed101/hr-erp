@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from 'react';
 import {
     Box,
     Paper,
     Typography,
     TextField,
     Button,
-    Grid,
     Avatar,
     Divider,
     Alert,
@@ -33,6 +31,7 @@ import {
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../features/auth/authSlice';
 import { profileAPI } from '../../services/api';
+import { useEffect, useState } from 'react';
 
 const Profile = () => {
     const user = useSelector(selectCurrentUser);
@@ -139,7 +138,7 @@ const Profile = () => {
     );
 
     return (
-        <Box sx={{ maxWidth: 1200, margin: '0 auto', p: { xs: 1, md: 3 } }}>
+        <div className="p-4 md:p-6 w-full">
             <Card elevation={4} sx={{ borderRadius: 4, overflow: 'hidden', border: '1px solid', borderColor: 'divider' }}>
                 {/* Compact Header */}
                 <Box sx={{
@@ -208,15 +207,15 @@ const Profile = () => {
                     </Box>
                 </Box>
 
-                <Box sx={{ p: { xs: 2, md: 3 } }}>
+                <Box sx={{ p: { xs: 2, md: 4 } }}>
                     {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
                     <form onSubmit={handleSubmit}>
-                        <Grid container spacing={3}>
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                             {/* Left Column: Bio & Summary */}
-                            <Grid item xs={12} md={4}>
-                                <Stack spacing={2}>
-                                    <Box sx={{ p: 2, borderRadius: 3, bgcolor: 'action.hover', border: '1px solid', borderColor: 'divider' }}>
+                            <div className="lg:col-span-4">
+                                <Stack spacing={3}>
+                                    <Box sx={{ p: 2.5, borderRadius: 3, bgcolor: 'action.hover', border: '1px solid', borderColor: 'divider' }}>
                                         <SectionHeader icon={PersonIcon} title="About Me" />
                                         <TextField
                                             fullWidth
@@ -233,7 +232,7 @@ const Profile = () => {
                                         />
                                     </Box>
 
-                                    <Box sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
+                                    <Box sx={{ p: 2.5, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
                                         <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase' }}>
                                             Profile Status
                                         </Typography>
@@ -242,44 +241,40 @@ const Profile = () => {
                                         </Typography>
                                     </Box>
                                 </Stack>
-                            </Grid>
+                            </div>
 
                             {/* Right Column: Detailed Forms */}
-                            <Grid item xs={12} md={8}>
-                                <Stack spacing={3}>
+                            <div className="lg:col-span-8">
+                                <Stack spacing={4}>
                                     {/* Personal Info */}
                                     <Box>
                                         <SectionHeader icon={EventIcon} title="Personal Details" />
-                                        <Grid container spacing={2}>
-                                            <Grid item xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    size="small"
-                                                    label="Date of Birth"
-                                                    name="date_of_birth"
-                                                    type="date"
-                                                    value={formData.date_of_birth}
-                                                    onChange={handleChange}
-                                                    disabled={!editMode}
-                                                    InputLabelProps={{ shrink: true }}
-                                                />
-                                            </Grid>
-                                            <Grid item xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    select
-                                                    size="small"
-                                                    label="Gender"
-                                                    name="gender"
-                                                    value={formData.gender}
-                                                    onChange={handleChange}
-                                                    disabled={!editMode}
-                                                >
-                                                    <MenuItem value="male">Male</MenuItem>
-                                                    <MenuItem value="female">Female</MenuItem>
-                                                </TextField>
-                                            </Grid>
-                                        </Grid>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <TextField
+                                                fullWidth
+                                                size="small"
+                                                label="Date of Birth"
+                                                name="date_of_birth"
+                                                type="date"
+                                                value={formData.date_of_birth}
+                                                onChange={handleChange}
+                                                disabled={!editMode}
+                                                InputLabelProps={{ shrink: true }}
+                                            />
+                                            <TextField
+                                                fullWidth
+                                                select
+                                                size="small"
+                                                label="Gender"
+                                                name="gender"
+                                                value={formData.gender}
+                                                onChange={handleChange}
+                                                disabled={!editMode}
+                                            >
+                                                <MenuItem value="male">Male</MenuItem>
+                                                <MenuItem value="female">Female</MenuItem>
+                                            </TextField>
+                                        </div>
                                     </Box>
 
                                     <Divider />
@@ -287,8 +282,8 @@ const Profile = () => {
                                     {/* Contact Information */}
                                     <Box>
                                         <SectionHeader icon={LocationIcon} title="Contact Information" />
-                                        <Grid container spacing={2}>
-                                            <Grid item xs={12}>
+                                        <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
+                                            <div className="sm:col-span-12">
                                                 <TextField
                                                     fullWidth
                                                     size="small"
@@ -298,8 +293,8 @@ const Profile = () => {
                                                     onChange={handleChange}
                                                     disabled={!editMode}
                                                 />
-                                            </Grid>
-                                            <Grid item xs={12} sm={6} md={3}>
+                                            </div>
+                                            <div className="sm:col-span-12 md:col-span-3">
                                                 <TextField
                                                     fullWidth
                                                     size="small"
@@ -309,8 +304,8 @@ const Profile = () => {
                                                     onChange={handleChange}
                                                     disabled={!editMode}
                                                 />
-                                            </Grid>
-                                            <Grid item xs={12} sm={6} md={3}>
+                                            </div>
+                                            <div className="sm:col-span-12 md:col-span-3">
                                                 <TextField
                                                     fullWidth
                                                     size="small"
@@ -320,8 +315,8 @@ const Profile = () => {
                                                     onChange={handleChange}
                                                     disabled={!editMode}
                                                 />
-                                            </Grid>
-                                            <Grid item xs={6} md={3}>
+                                            </div>
+                                            <div className="sm:col-span-6 md:col-span-3">
                                                 <TextField
                                                     fullWidth
                                                     size="small"
@@ -331,8 +326,8 @@ const Profile = () => {
                                                     onChange={handleChange}
                                                     disabled={!editMode}
                                                 />
-                                            </Grid>
-                                            <Grid item xs={6} md={3}>
+                                            </div>
+                                            <div className="sm:col-span-6 md:col-span-3">
                                                 <TextField
                                                     fullWidth
                                                     size="small"
@@ -342,8 +337,8 @@ const Profile = () => {
                                                     onChange={handleChange}
                                                     disabled={!editMode}
                                                 />
-                                            </Grid>
-                                        </Grid>
+                                            </div>
+                                        </div>
                                     </Box>
 
                                     <Divider />
@@ -351,8 +346,8 @@ const Profile = () => {
                                     {/* Emergency Contact */}
                                     <Box>
                                         <SectionHeader icon={SecurityIcon} title="Emergency Contact" />
-                                        <Grid container spacing={2}>
-                                            <Grid item xs={12} sm={5}>
+                                        <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
+                                            <div className="sm:col-span-12 md:col-span-5">
                                                 <TextField
                                                     fullWidth
                                                     size="small"
@@ -362,8 +357,8 @@ const Profile = () => {
                                                     onChange={handleChange}
                                                     disabled={!editMode}
                                                 />
-                                            </Grid>
-                                            <Grid item xs={12} sm={4}>
+                                            </div>
+                                            <div className="sm:col-span-12 md:col-span-4">
                                                 <TextField
                                                     fullWidth
                                                     size="small"
@@ -374,8 +369,8 @@ const Profile = () => {
                                                     disabled={!editMode}
                                                     InputProps={{ startAdornment: <PhoneIcon sx={{ mr: 1, color: 'text.disabled', fontSize: '1rem' }} /> }}
                                                 />
-                                            </Grid>
-                                            <Grid item xs={12} sm={3}>
+                                            </div>
+                                            <div className="sm:col-span-12 md:col-span-3">
                                                 <TextField
                                                     fullWidth
                                                     size="small"
@@ -385,8 +380,8 @@ const Profile = () => {
                                                     onChange={handleChange}
                                                     disabled={!editMode}
                                                 />
-                                            </Grid>
-                                        </Grid>
+                                            </div>
+                                        </div>
                                     </Box>
 
                                     {editMode && (
@@ -410,8 +405,8 @@ const Profile = () => {
                                         </Box>
                                     )}
                                 </Stack>
-                            </Grid>
-                        </Grid>
+                            </div>
+                        </div>
                     </form>
                 </Box>
             </Card>
@@ -426,7 +421,7 @@ const Profile = () => {
                     Profile updated successfully!
                 </Alert>
             </Snackbar>
-        </Box>
+        </div>
     );
 };
 
