@@ -12,7 +12,7 @@ RUN npm ci --only=production
 COPY . .
 
 # Expose correct port for recruitment service
-EXPOSE 3006
+EXPOSE 3008
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \

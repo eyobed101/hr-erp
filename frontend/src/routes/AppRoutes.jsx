@@ -38,6 +38,8 @@ import DepartmentManagement from '../pages/organization/DepartmentManagement';
 import JobCategoryManagement from '../pages/organization/JobCategoryManagement';
 import ChangeStructureManagement from '../pages/organization/ChangeStructureManagement';
 
+import BenefitManagement from "../pages/benefits/BenefitManagement";
+
 
 
 const AppRoutes = () => {
@@ -94,6 +96,8 @@ const AppRoutes = () => {
 
 
                 {/* NEW ORGANIZATION ROUTES */}
+
+                <Route path="/admin/benefits" element={<RoleBasedRoute allowedRoles={[ROLES.ADMIN]}><BenefitManagement /></RoleBasedRoute>} />
                 <Route path="/admin/structure_change" element={<RoleBasedRoute allowedRoles={[ROLES.ADMIN]}><ChangeStructureManagement /></RoleBasedRoute>} />
 
                 <Route path="/admin/departments" element={<RoleBasedRoute allowedRoles={[ROLES.ADMIN]}><DepartmentManagement /></RoleBasedRoute>} />

@@ -21,6 +21,7 @@ export const NAVIGATION_CONFIG = {
         { path: '/admin/structure_change', label: 'Structure Change', icon: 'structure_change' },
 
         { path: '/admin/job-categories', label: 'Job Categories', icon: 'job-categories' },
+        { path: '/admin/benefits', label: 'Benefits', icon: 'benefits' },
         { path: '/admin/settings', label: 'Settings', icon: 'settings' },
         { path: '/admin/reports', label: 'Reports', icon: 'reports' },
     ],

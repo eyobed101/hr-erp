@@ -169,10 +169,15 @@ export const trainingAPI = {
 };
 
 export const benefitsAPI = {
-    getBenefits: () => benefitsService.get('benefits'),
+    getBenefits: (params) => benefitsService.get('benefits', { params }),
     getBenefit: (id) => benefitsService.get(`benefits/${id}`),
+    createBenefit: (data) => benefitsService.post('benefits', data),
+    updateBenefit: (id, data) => benefitsService.put(`benefits/${id}`, data),
+    deleteBenefit: (id) => benefitsService.delete(`benefits/${id}`),
     enrollBenefit: (id, data) => benefitsService.post(`benefits/${id}/enroll`, data),
 };
+
+
 
 export default {
     auth: authService,
