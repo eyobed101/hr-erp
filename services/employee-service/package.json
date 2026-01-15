@@ -1,14 +1,21 @@
 {
-  "name": "api-gateway",
+  "name": "employee-service",
   "version": "1.0.0",
+  "main": "server.js",
   "type": "module",
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js"
   },
   "dependencies": {
-    "cors": "^2.8.5",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.6.1",
     "express": "^4.22.1",
-    "http-proxy-middleware": "^2.0.9"
+    "jsonwebtoken": "^9.0.0",
+    "mysql2": "^3.16.0",
+    "sequelize": "^6.37.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
   }
 }
