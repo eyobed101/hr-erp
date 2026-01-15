@@ -60,10 +60,10 @@ const trainingService = createServiceInstance('training');
 const benefitsService = createServiceInstance('benefits');
 
 export const authAPI = {
-    login: (credentials) => authService.post('/auth/login', credentials),
-    register: (userData) => authService.post('/auth/register', userData),
-    validateToken: () => authService.post('/auth/validate'),
-    getUsers: (params) => authService.get('/auth/users', { params }),
+    login: (credentials) => authService.post('auth/login', credentials),
+    register: (userData) => authService.post('auth/register', userData),
+    validateToken: () => authService.post('auth/validate'),
+    getUsers: (params) => authService.get('auth/users', { params }),
 };
 
 export const profileAPI = {
@@ -97,11 +97,11 @@ export const recruitmentAPI = {
 };
 
 export const leaveAPI = {
-    getLeaves: (params) => leaveService.get('leaves', { params }),
-    getLeave: (id) => leaveService.get(`leaves/${id}`),
-    createLeave: (data) => leaveService.post('leaves', data),
-    approveLeave: (id) => leaveService.put(`leaves/${id}/approve`),
-    rejectLeave: (id) => leaveService.put(`leaves/${id}/reject`),
+    getLeaves: (params) => leaveService.get('leave', { params }),
+    getLeave: (id) => leaveService.get(`leave/${id}`),
+    createLeave: (data) => leaveService.post('leave', data),
+    approveLeave: (id) => leaveService.put(`leave/${id}/approve`),
+    rejectLeave: (id) => leaveService.put(`leave/${id}/reject`),
 };
 
 export const attendanceAPI = {
@@ -111,16 +111,46 @@ export const attendanceAPI = {
 };
 
 export const organizationAPI = {
-    getStructure: () => organizationService.get('structure'),
-    getDepartments: () => organizationService.get('departments'),
-    createDepartment: (data) => organizationService.post('departments', data),
-    updateDepartment: (id, data) => organizationService.put(`departments/${id}`, data),
+    getStructure: () => organizationService.get('orgStructure'),
+    getDepartments: () => organizationService.get('orgStructure/departments'), // Adjust if needed based on route
+    createDepartment: (data) => organizationService.post('orgStructure/departments', data),
+    updateDepartment: (id, data) => organizationService.put(`orgStructure/departments/${id}`, data),
 };
 
 export const trainingAPI = {
+    // Course actions
     getTrainings: (params) => trainingService.get('courses', { params }),
-    getTraining: (id) => trainingService.get(`courses/${id}`),
-    enrollTraining: (id) => trainingService.post(`courses/${id}/enroll`),
+    getCourses: (params) => trainingService.get('courses', { params }),
+    getCourse: (id) => trainingService.get(`courses/${id}`),
+    createCourse: (data) => trainingService.post('courses', data),
+    updateCourse: (id, data) => trainingService.put(`courses/${id}`, data),
+    deleteCourse: (id) => trainingService.delete(`courses/${id}`),
+
+    // Enrollment actions
+    enrollCourse: (data) => trainingService.post('enrollments', data),
+    getMyEnrollments: () => trainingService.get('enrollments/my'),
+    getCourseProgress: (courseId) => trainingService.get(`enrollments/${courseId}/progress`),
+    markLessonComplete: (lessonId) => trainingService.post(`enrollments/lessons/${lessonId}/complete`),
+
+    // Quiz actions
+    getAllQuizzes: () => trainingService.get('quizzes'),
+    getQuiz: (courseId) => trainingService.get(`quizzes/course/${courseId}`),
+    createQuiz: (data) => trainingService.post('quizzes', data),
+    updateQuiz: (id, data) => trainingService.put(`quizzes/${id}`, data),
+    deleteQuiz: (id) => trainingService.delete(`quizzes/${id}`),
+    getQuizAttemptsCount: (quizId) => trainingService.get(`quizzes/${quizId}/attempts/count`),
+    submitQuiz: (quizId, data) => trainingService.post(`quizzes/${quizId}/attempt`),
+    getMyAttempts: () => trainingService.get('quizzes/attempts/my'),
+
+    // Question actions
+    addQuestion: (quizId, data) => trainingService.post(`quizzes/${quizId}/questions`, data),
+    updateQuestion: (questionId, data) => trainingService.put(`quizzes/actions/update-question/${questionId}`, data),
+    deleteQuestion: (questionId) => trainingService.delete(`quizzes/actions/delete-question/${questionId}`),
+
+    // Certificate actions
+    getAllCertificates: (params) => trainingService.get('certificates', { params }),
+    getMyCertificates: () => trainingService.get('certificates/my'),
+    downloadCertificate: (id) => trainingService.get(`certificates/${id}/download`, { responseType: 'blob' }),
 };
 
 export const benefitsAPI = {

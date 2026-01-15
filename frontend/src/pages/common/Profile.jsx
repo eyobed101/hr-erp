@@ -12,18 +12,23 @@ import {
     CircularProgress,
     MenuItem,
     IconButton,
-    Snackbar
+    Snackbar,
+    Stack,
+    Card,
+    Tooltip
 } from '@mui/material';
 import {
     Person as PersonIcon,
     Email as EmailIcon,
     Phone as PhoneIcon,
     Home as HomeIcon,
-    Work as WorkIcon,
     Save as SaveIcon,
     Edit as EditIcon,
     Cancel as CancelIcon,
-    Security as SecurityIcon
+    Security as SecurityIcon,
+    LocationOn as LocationIcon,
+    Event as EventIcon,
+    Wc as GenderIcon
 } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../features/auth/authSlice';
@@ -124,64 +129,78 @@ const Profile = () => {
         </Box>
     );
 
+    const SectionHeader = ({ icon: Icon, title }) => (
+        <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1, mt: 1.5 }}>
+            <Icon size={18} sx={{ color: 'primary.main', fontSize: '1.1rem' }} />
+            <Typography variant="overline" sx={{ fontWeight: 700, color: 'text.secondary', letterSpacing: 1 }}>
+                {title}
+            </Typography>
+        </Stack>
+    );
+
     return (
-        <Box sx={{ p: { xs: 2, md: 4 }, maxWidth: 1000, margin: '0 auto' }}>
-            <Paper elevation={3} sx={{ borderRadius: 4, overflow: 'hidden' }}>
-                {/* Header/Cover Area */}
+        <Box sx={{ maxWidth: 1200, margin: '0 auto', p: { xs: 1, md: 3 } }}>
+            <Card elevation={4} sx={{ borderRadius: 4, overflow: 'hidden', border: '1px solid', borderColor: 'divider' }}>
+                {/* Compact Header */}
                 <Box sx={{
-                    height: 160,
-                    background: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)',
-                    position: 'relative'
+                    height: 120,
+                    background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+                    position: 'relative',
+                    display: 'flex',
+                    alignItems: 'center',
+                    px: 4
                 }}>
-                    <Box sx={{
-                        position: 'absolute',
-                        bottom: -50,
-                        left: 40,
-                        display: 'flex',
-                        alignItems: 'flex-end',
-                        gap: 2
-                    }}>
+                    <Stack direction="row" spacing={3} alignItems="center" sx={{ position: 'relative', zIndex: 1 }}>
                         <Avatar
                             src={formData.profile_picture_url}
                             sx={{
-                                width: 120,
-                                height: 120,
-                                border: '4px solid white',
+                                width: 90,
+                                height: 90,
+                                border: '3px solid white',
                                 boxShadow: 3,
                                 bgcolor: 'primary.main',
-                                fontSize: '3rem'
+                                fontSize: '2.5rem'
                             }}
                         >
                             {user?.first_name?.charAt(0)}
                         </Avatar>
-                        <Box sx={{ mb: 1 }}>
-                            <Typography variant="h4" fontWeight="bold" color="white" sx={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
+                        <Box>
+                            <Typography variant="h5" fontWeight="bold" color="white">
                                 {user?.first_name} {user?.last_name}
                             </Typography>
-                            <Typography variant="subtitle1" color="rgba(255,255,255,0.8)">
-                                {user?.role?.toUpperCase()}
-                            </Typography>
+                            <Stack direction="row" spacing={1} alignItems="center">
+                                <Typography variant="body2" color="rgba(255,255,255,0.7)" sx={{ textTransform: 'uppercase', letterSpacing: 1 }}>
+                                    {user?.role}
+                                </Typography>
+                                <Divider orientation="vertical" flexItem sx={{ bgcolor: 'rgba(255,255,255,0.3)', height: 12, my: 'auto' }} />
+                                <Typography variant="body2" color="rgba(255,255,255,0.7)">
+                                    {user?.email}
+                                </Typography>
+                            </Stack>
                         </Box>
-                    </Box>
-                    <Box sx={{ position: 'absolute', bottom: 10, right: 20 }}>
+                    </Stack>
+                    <Box sx={{ ml: 'auto', display: 'flex', gap: 1 }}>
                         {!editMode ? (
                             <Button
                                 variant="contained"
                                 startIcon={<EditIcon />}
+                                size="small"
                                 onClick={() => setEditMode(true)}
-                                sx={{ bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: '#f5f5f5' } }}
+                                sx={{ bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: '#f1f5f9' }, borderRadius: 2 }}
                             >
                                 Edit Profile
                             </Button>
                         ) : (
                             <Button
-                                variant="contained"
-                                color="error"
+                                variant="outlined"
+                                color="inherit"
+                                size="small"
                                 startIcon={<CancelIcon />}
                                 onClick={() => {
                                     setEditMode(false);
                                     fetchProfile();
                                 }}
+                                sx={{ color: 'white', borderColor: 'white', '&:hover': { bgcolor: 'rgba(255,255,255,0.1)' }, borderRadius: 2 }}
                             >
                                 Cancel
                             </Button>
@@ -189,200 +208,221 @@ const Profile = () => {
                     </Box>
                 </Box>
 
-                <Box sx={{ mt: 8, p: 4 }}>
-                    {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
+                <Box sx={{ p: { xs: 2, md: 3 } }}>
+                    {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
                     <form onSubmit={handleSubmit}>
-                        <Grid container spacing={4}>
-                            {/* Basic Information */}
-                            <Grid item xs={12}>
-                                <Typography variant="h6" gutterBottom display="flex" alignItems="center" gap={1}>
-                                    <PersonIcon color="primary" /> Basic Information
-                                </Typography>
-                                <Divider sx={{ mb: 2 }} />
-                                <Grid container spacing={2}>
-                                    <Grid item xs={12} md={6}>
-                                        <TextField
-                                            fullWidth
-                                            label="Email Address"
-                                            value={user?.email || ''}
-                                            disabled
-                                            InputProps={{ startAdornment: <EmailIcon sx={{ mr: 1, color: 'text.secondary' }} /> }}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} md={3}>
-                                        <TextField
-                                            fullWidth
-                                            label="Date of Birth"
-                                            name="date_of_birth"
-                                            type="date"
-                                            value={formData.date_of_birth}
-                                            onChange={handleChange}
-                                            disabled={!editMode}
-                                            InputLabelProps={{ shrink: true }}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} md={3}>
-                                        <TextField
-                                            fullWidth
-                                            select
-                                            label="Gender"
-                                            name="gender"
-                                            value={formData.gender}
-                                            onChange={handleChange}
-                                            disabled={!editMode}
-                                        >
-                                            <MenuItem value="male">Male</MenuItem>
-                                            <MenuItem value="female">Female</MenuItem>
-                                        </TextField>
-                                    </Grid>
-                                    <Grid item xs={12}>
+                        <Grid container spacing={3}>
+                            {/* Left Column: Bio & Summary */}
+                            <Grid item xs={12} md={4}>
+                                <Stack spacing={2}>
+                                    <Box sx={{ p: 2, borderRadius: 3, bgcolor: 'action.hover', border: '1px solid', borderColor: 'divider' }}>
+                                        <SectionHeader icon={PersonIcon} title="About Me" />
                                         <TextField
                                             fullWidth
                                             multiline
-                                            rows={3}
-                                            label="Bio"
+                                            rows={8}
+                                            size="small"
                                             name="bio"
                                             value={formData.bio}
                                             onChange={handleChange}
                                             disabled={!editMode}
-                                            placeholder="Tell us a little about yourself..."
+                                            placeholder="Write a brief professional summary..."
+                                            variant="outlined"
+                                            sx={{ bgcolor: 'background.paper' }}
                                         />
-                                    </Grid>
-                                </Grid>
+                                    </Box>
+
+                                    <Box sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
+                                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase' }}>
+                                            Profile Status
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                                            {profileExists ? "Profile is complete and up to date." : "Complete your profile to provide more information."}
+                                        </Typography>
+                                    </Box>
+                                </Stack>
                             </Grid>
 
-                            {/* Contact Information */}
-                            <Grid item xs={12}>
-                                <Typography variant="h6" gutterBottom display="flex" alignItems="center" gap={1}>
-                                    <HomeIcon color="primary" /> Contact Details
-                                </Typography>
-                                <Divider sx={{ mb: 2 }} />
-                                <Grid container spacing={2}>
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            fullWidth
-                                            label="Address"
-                                            name="address"
-                                            value={formData.address}
-                                            onChange={handleChange}
-                                            disabled={!editMode}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} md={4}>
-                                        <TextField
-                                            fullWidth
-                                            label="City"
-                                            name="city"
-                                            value={formData.city}
-                                            onChange={handleChange}
-                                            disabled={!editMode}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} md={4}>
-                                        <TextField
-                                            fullWidth
-                                            label="State"
-                                            name="state"
-                                            value={formData.state}
-                                            onChange={handleChange}
-                                            disabled={!editMode}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={6} md={2}>
-                                        <TextField
-                                            fullWidth
-                                            label="Country"
-                                            name="country"
-                                            value={formData.country}
-                                            onChange={handleChange}
-                                            disabled={!editMode}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={6} md={2}>
-                                        <TextField
-                                            fullWidth
-                                            label="Postal Code"
-                                            name="postal_code"
-                                            value={formData.postal_code}
-                                            onChange={handleChange}
-                                            disabled={!editMode}
-                                        />
-                                    </Grid>
-                                </Grid>
-                            </Grid>
+                            {/* Right Column: Detailed Forms */}
+                            <Grid item xs={12} md={8}>
+                                <Stack spacing={3}>
+                                    {/* Personal Info */}
+                                    <Box>
+                                        <SectionHeader icon={EventIcon} title="Personal Details" />
+                                        <Grid container spacing={2}>
+                                            <Grid item xs={12} sm={6}>
+                                                <TextField
+                                                    fullWidth
+                                                    size="small"
+                                                    label="Date of Birth"
+                                                    name="date_of_birth"
+                                                    type="date"
+                                                    value={formData.date_of_birth}
+                                                    onChange={handleChange}
+                                                    disabled={!editMode}
+                                                    InputLabelProps={{ shrink: true }}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12} sm={6}>
+                                                <TextField
+                                                    fullWidth
+                                                    select
+                                                    size="small"
+                                                    label="Gender"
+                                                    name="gender"
+                                                    value={formData.gender}
+                                                    onChange={handleChange}
+                                                    disabled={!editMode}
+                                                >
+                                                    <MenuItem value="male">Male</MenuItem>
+                                                    <MenuItem value="female">Female</MenuItem>
+                                                </TextField>
+                                            </Grid>
+                                        </Grid>
+                                    </Box>
 
-                            {/* Emergency Contact */}
-                            <Grid item xs={12}>
-                                <Typography variant="h6" gutterBottom display="flex" alignItems="center" gap={1}>
-                                    <SecurityIcon color="primary" /> Emergency Contact
-                                </Typography>
-                                <Divider sx={{ mb: 2 }} />
-                                <Grid container spacing={2}>
-                                    <Grid item xs={12} md={5}>
-                                        <TextField
-                                            fullWidth
-                                            label="Contact Name"
-                                            name="emergency_contact_name"
-                                            value={formData.emergency_contact_name}
-                                            onChange={handleChange}
-                                            disabled={!editMode}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} md={4}>
-                                        <TextField
-                                            fullWidth
-                                            label="Phone Number"
-                                            name="emergency_contact_phone"
-                                            value={formData.emergency_contact_phone}
-                                            onChange={handleChange}
-                                            disabled={!editMode}
-                                            InputProps={{ startAdornment: <PhoneIcon sx={{ mr: 1, color: 'text.secondary' }} /> }}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} md={3}>
-                                        <TextField
-                                            fullWidth
-                                            label="Relationship"
-                                            name="emergency_contact_relationship"
-                                            value={formData.emergency_contact_relationship}
-                                            onChange={handleChange}
-                                            disabled={!editMode}
-                                        />
-                                    </Grid>
-                                </Grid>
-                            </Grid>
+                                    <Divider />
 
-                            {editMode && (
-                                <Grid item xs={12} sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-                                    <Button
-                                        type="submit"
-                                        variant="contained"
-                                        size="large"
-                                        disabled={saving}
-                                        startIcon={saving ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}
-                                        sx={{
-                                            borderRadius: 2,
-                                            px: 4,
-                                            background: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)'
-                                        }}
-                                    >
-                                        {saving ? 'Saving...' : 'Save Changes'}
-                                    </Button>
-                                </Grid>
-                            )}
+                                    {/* Contact Information */}
+                                    <Box>
+                                        <SectionHeader icon={LocationIcon} title="Contact Information" />
+                                        <Grid container spacing={2}>
+                                            <Grid item xs={12}>
+                                                <TextField
+                                                    fullWidth
+                                                    size="small"
+                                                    label="Residential Address"
+                                                    name="address"
+                                                    value={formData.address}
+                                                    onChange={handleChange}
+                                                    disabled={!editMode}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12} sm={6} md={3}>
+                                                <TextField
+                                                    fullWidth
+                                                    size="small"
+                                                    label="City"
+                                                    name="city"
+                                                    value={formData.city}
+                                                    onChange={handleChange}
+                                                    disabled={!editMode}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12} sm={6} md={3}>
+                                                <TextField
+                                                    fullWidth
+                                                    size="small"
+                                                    label="State"
+                                                    name="state"
+                                                    value={formData.state}
+                                                    onChange={handleChange}
+                                                    disabled={!editMode}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={6} md={3}>
+                                                <TextField
+                                                    fullWidth
+                                                    size="small"
+                                                    label="Country"
+                                                    name="country"
+                                                    value={formData.country}
+                                                    onChange={handleChange}
+                                                    disabled={!editMode}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={6} md={3}>
+                                                <TextField
+                                                    fullWidth
+                                                    size="small"
+                                                    label="Zip Code"
+                                                    name="postal_code"
+                                                    value={formData.postal_code}
+                                                    onChange={handleChange}
+                                                    disabled={!editMode}
+                                                />
+                                            </Grid>
+                                        </Grid>
+                                    </Box>
+
+                                    <Divider />
+
+                                    {/* Emergency Contact */}
+                                    <Box>
+                                        <SectionHeader icon={SecurityIcon} title="Emergency Contact" />
+                                        <Grid container spacing={2}>
+                                            <Grid item xs={12} sm={5}>
+                                                <TextField
+                                                    fullWidth
+                                                    size="small"
+                                                    label="Full Name"
+                                                    name="emergency_contact_name"
+                                                    value={formData.emergency_contact_name}
+                                                    onChange={handleChange}
+                                                    disabled={!editMode}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12} sm={4}>
+                                                <TextField
+                                                    fullWidth
+                                                    size="small"
+                                                    label="Phone"
+                                                    name="emergency_contact_phone"
+                                                    value={formData.emergency_contact_phone}
+                                                    onChange={handleChange}
+                                                    disabled={!editMode}
+                                                    InputProps={{ startAdornment: <PhoneIcon sx={{ mr: 1, color: 'text.disabled', fontSize: '1rem' }} /> }}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12} sm={3}>
+                                                <TextField
+                                                    fullWidth
+                                                    size="small"
+                                                    label="Relationship"
+                                                    name="emergency_contact_relationship"
+                                                    value={formData.emergency_contact_relationship}
+                                                    onChange={handleChange}
+                                                    disabled={!editMode}
+                                                />
+                                            </Grid>
+                                        </Grid>
+                                    </Box>
+
+                                    {editMode && (
+                                        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                                            <Button
+                                                type="submit"
+                                                variant="contained"
+                                                disabled={saving}
+                                                startIcon={saving ? <CircularProgress size={16} color="inherit" /> : <SaveIcon />}
+                                                sx={{
+                                                    borderRadius: 2,
+                                                    px: 4,
+                                                    py: 1,
+                                                    fontWeight: 'bold',
+                                                    background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
+                                                    '&:hover': { background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' }
+                                                }}
+                                            >
+                                                {saving ? 'Saving...' : 'Save Profile'}
+                                            </Button>
+                                        </Box>
+                                    )}
+                                </Stack>
+                            </Grid>
                         </Grid>
                     </form>
                 </Box>
-            </Paper>
+            </Card>
 
             <Snackbar
                 open={success}
-                autoHideDuration={6000}
+                autoHideDuration={4000}
                 onClose={() => setSuccess(false)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             >
-                <Alert onClose={() => setSuccess(false)} severity="success" sx={{ width: '100%' }}>
+                <Alert onClose={() => setSuccess(false)} severity="success" sx={{ width: '100%', borderRadius: 3 }}>
                     Profile updated successfully!
                 </Alert>
             </Snackbar>
