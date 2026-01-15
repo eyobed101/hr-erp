@@ -64,6 +64,7 @@ export const authAPI = {
     register: (userData) => authService.post('auth/register', userData),
     validateToken: () => authService.post('auth/validate'),
     getUsers: (params) => authService.get('auth/users', { params }),
+    getStats: () => authService.get('auth/stats'),
 };
 
 export const profileAPI = {
@@ -94,6 +95,7 @@ export const recruitmentAPI = {
     getApplication: (id) => recruitmentService.get(`recruitment/applications/${id}`),
     createApplication: (data) => recruitmentService.post('recruitment/applications', data),
     updateApplicationStage: (id, data) => recruitmentService.patch(`recruitment/applications/${id}/stage`, data),
+    getStats: () => recruitmentService.get('recruitment/stats'),
 };
 
 export const leaveAPI = {
@@ -151,6 +153,7 @@ export const trainingAPI = {
     getAllCertificates: (params) => trainingService.get('certificates', { params }),
     getMyCertificates: () => trainingService.get('certificates/my'),
     downloadCertificate: (id) => trainingService.get(`certificates/${id}/download`, { responseType: 'blob' }),
+    getStats: () => trainingService.get('courses/stats'),
 };
 
 export const benefitsAPI = {

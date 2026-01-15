@@ -1,5 +1,7 @@
 const Course = require('../models/courseModel');
 const Lesson = require('../models/lessonModel');
+const Enrollment = require('../models/enrollmentModel');
+const sequelize = require('../config/db');
 const { Op } = require('sequelize');
 
 exports.getCourses = async (req, res) => {
@@ -104,6 +106,49 @@ exports.deleteCourse = async (req, res) => {
 
         await course.update({ is_active: false });
         res.status(200).json({ message: 'Course deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+exports.getStats = async (req, res) => {
+    try {
+        const totalCourses = await Course.count({ where: { is_active: true } });
+        const totalEnrollments = await Enrollment.count();
+
+        const enrollmentStatus = await Enrollment.findAll({
+            attributes: ['status', [sequelize.fn('COUNT', sequelize.col('status')), 'count']],
+            group: ['status']
+        });
+
+        const difficultyDistribution = await Course.findAll({
+            where: { is_active: true },
+            attributes: ['difficulty_level', [sequelize.fn('COUNT', sequelize.col('difficulty_level')), 'count']],
+            group: ['difficulty_level']
+        });
+
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+        const recentEnrollments = await Enrollment.findAll({
+            where: {
+                created_at: { [Op.gte]: sevenDaysAgo }
+            },
+            attributes: [
+                [sequelize.fn('DATE', sequelize.col('created_at')), 'date'],
+                [sequelize.fn('COUNT', sequelize.col('id')), 'count']
+            ],
+            group: [sequelize.fn('DATE', sequelize.col('created_at'))],
+            order: [[sequelize.fn('DATE', sequelize.col('created_at')), 'ASC']]
+        });
+
+        res.status(200).json({
+            totalCourses,
+            totalEnrollments,
+            enrollmentStatus,
+            difficultyDistribution,
+            recentEnrollments
+        });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }

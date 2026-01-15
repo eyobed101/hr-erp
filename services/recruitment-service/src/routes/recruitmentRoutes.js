@@ -7,6 +7,7 @@ const { authenticate, authorize } = require('../middleware/authMiddleware');
 // Only HR and Admin can manage jobs. Listing jobs could be public or protected.
 // Let's make viewing jobs public for candidates, but management protected.
 router.get('/jobs', recruitmentController.getJobs);
+router.get('/stats', authenticate, authorize('hr', 'admin'), recruitmentController.getStats);
 router.get('/jobs/:id', recruitmentController.getJobById);
 
 router.post('/jobs', authenticate, authorize('hr', 'admin'), recruitmentController.createJob);

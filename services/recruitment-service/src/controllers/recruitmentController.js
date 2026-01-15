@@ -1,4 +1,6 @@
 const { Job, Application } = require('../models');
+const sequelize = require('../models').sequelize;
+const { Op } = require('sequelize');
 
 // Job Controllers
 exports.createJob = async (req, res) => {
@@ -121,3 +123,39 @@ exports.updateApplicationStage = async (req, res) => {
 // but based on the schema, recruitment doesn't have its own users, it uses auth_users.
 exports.register = (req, res) => res.status(501).json({ message: 'Use Auth Service for registration' });
 exports.login = (req, res) => res.status(501).json({ message: 'Use Auth Service for login' });
+exports.getStats = async (req, res) => {
+    try {
+        const totalJobs = await Job.count({ where: { status: 'open' } });
+        const totalApplications = await Application.count();
+
+        const stageDistribution = await Application.findAll({
+            attributes: ['stage', [sequelize.fn('COUNT', sequelize.col('stage')), 'count']],
+            group: ['stage']
+        });
+
+        // Recent applications trend
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+        const recentApplications = await Application.findAll({
+            where: {
+                applied_date: { [Op.gte]: sevenDaysAgo }
+            },
+            attributes: [
+                [sequelize.fn('DATE', sequelize.col('applied_date')), 'date'],
+                [sequelize.fn('COUNT', sequelize.col('id')), 'count']
+            ],
+            group: [sequelize.fn('DATE', sequelize.col('applied_date'))],
+            order: [[sequelize.fn('DATE', sequelize.col('applied_date')), 'ASC']]
+        });
+
+        res.status(200).json({
+            totalJobs,
+            totalApplications,
+            stageDistribution,
+            recentApplications
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
