@@ -36,7 +36,7 @@ async function startServer() {
     await sequelize.sync({ alter: true });
     console.log('Database synced successfully');
 
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
       console.log(`Recruitment Service running on port ${PORT}`);
     });
   } catch (error) {

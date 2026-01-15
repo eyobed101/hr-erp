@@ -50,13 +50,18 @@ exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
+
         const user = await AuthUser.findOne({ where: { email } });
         if (!user) {
+            console.log(`Login failed: User not found for email ${email}`);
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
         const isMatch = await bcrypt.compare(password, user.password_hash);
         if (!isMatch) {
+            console.log(`Login failed: Password mismatch for user ${email}`);
+            // console.log('Hash in DB:', user.password_hash); 
+            // console.log('Provided:', password);
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 

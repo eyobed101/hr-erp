@@ -1,5 +1,11 @@
 ﻿import React, { useState, useEffect } from 'react';
+
 import {
+  Container,
+  Typography,
+  Tabs,
+  Tab,
+  Box,
   Table,
   TableBody,
   TableCell,
@@ -8,48 +14,60 @@ import {
   TableRow,
   Paper,
   Button,
-  Typography,
-  Container,
+  TextField,
   CircularProgress,
   Alert,
-  Box,
 } from '@mui/material';
-import { leaveAPI } from '../../services/api';
 
+import { leaveAPI, authAPI } from '../../services/api'; // Adjust import path as needed
 
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`leave-tabpanel-${index}`}
+      aria-labelledby={`leave-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
+    </div>
+  );
+}
 
-function LeaveRequestsPage() {
-  const [leaveRequests, setLeaveRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
+function LeaveManagementPage() {
+  const [tabValue, setTabValue] = useState(0);
+  const [requests, setRequests] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
+
+  // ── Fetch Pending Leave Requests ──
   useEffect(() => {
+    if (tabValue !== 0) return;
+
     const fetchPendingRequests = async () => {
       try {
         setLoading(true);
         setError(null);
-
-        const response = await leaveAPI.getLeaves();
-
-        // The backend now returns raw LeaveRequest objects
-        // We need to format dates and add placeholder employee data
-        const formatted = response.data.map(request => ({
-          id: request.id,
-          employeeId: request.employee_id,
-          // Placeholder employee info (temporary until employee-service integration)
-          firstName: 'Employee',
-          lastName: `#${request.employee_id}`,
-          email: `emp${request.employee_id}@company.et`,
-          address: 'N/A',
-          leaveType: request.leave_type,
-          startDate: new Date(request.start_date).toLocaleDateString('en-GB'),
-          endDate: new Date(request.end_date).toLocaleDateString('en-GB'),
-          daysRequested: request.days_requested,
-          status: request.status,
-          createdAt: new Date(request.created_at).toLocaleString(),
+        const response = await leaveAPI.getLeaves(); // ← Use your actual endpoint/method
+        // Example: leaveAPI.get('/getAllPending')
+        const formatted = response.data.map(r => ({
+          id: r.id,
+          employeeId: r.employee_id,
+          leaveType: r.leave_type,
+          startDate: new Date(r.start_date).toLocaleDateString('en-GB'),
+          endDate: new Date(r.end_date).toLocaleDateString('en-GB'),
+          daysRequested: r.days_requested,
+          status: r.status,
         }));
 
-        setLeaveRequests(formatted);
+        setRequests(formatted);
       } catch (err) {
         console.error(err);
         setError('Failed to load pending leave requests');
@@ -59,112 +77,207 @@ function LeaveRequestsPage() {
     };
 
     fetchPendingRequests();
-  }, []);
+  }, [tabValue]);
 
-  // Placeholder action – will be replaced with real API call later
-  const handleAction = (id, action) => {
-    // TODO: Real API call → PATCH/PUT /leave-requests/:id/status
-    alert(`Would ${action} request #${id} (simulation)`);
+  // ── Fetch Employees from auth-service ──
+  useEffect(() => {
+    if (tabValue !== 1 || employees.length > 0) return;
 
-    // Optimistic update example
-    setLeaveRequests(prev =>
-      prev.map(req =>
-        req.id === id ? { ...req, status: action } : req
+    const fetchEmployees = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await authAPI.getUsers({ role: 'employee' });
+        // Assuming response shape: { users: [...], pagination: {...} }
+
+        const employeeList = response.data.users.map(user => ({
+          employeeId: user.id,
+          firstName: user.first_name || 'Unknown',
+          lastName: user.last_name || '',
+          email: user.email || 'N/A',
+          createdAt: user.created_at,
+          allowedDays: 20, // ← default/fallback value (replace with real data later)
+        }));
+
+        setEmployees(employeeList);
+      } catch (err) {
+        console.error(err);
+        setError('Failed to load employee list');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEmployees();
+  }, [tabValue, employees.length]);
+
+  // ── Handlers ──
+  const handleAction = (requestId, action) => {
+    // TODO: Real API call to approve/decline
+    alert(`Simulating: ${action} request #${requestId}`);
+    setRequests(prev =>
+      prev.map(r => (r.id === requestId ? { ...r, status: action } : r))
+    );
+  };
+
+  const handleDaysChange = (employeeId, value) => {
+    setEmployees(prev =>
+      prev.map(emp =>
+        emp.employeeId === employeeId
+          ? { ...emp, allowedDays: Number(value) || 0 }
+          : emp
       )
     );
   };
 
-  if (loading) {
-    return (
-      <Container sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-        <CircularProgress size={60} />
-      </Container>
-    );
-  }
+  const handleSave = (employeeId) => {
+    const employee = employees.find(e => e.employeeId === employeeId);
+    if (!employee) return;
 
-  if (error) {
-    return (
-      <Container maxWidth="md" sx={{ mt: 4 }}>
-        <Alert severity="error">{error}</Alert>
-      </Container>
-    );
-  }
+    // TODO: Real API call → e.g. leaveAPI.updateAllowedDays(employeeId, employee.allowedDays)
+    alert(`Saving ${employee.allowedDays} allowed days for employee #${employeeId}`);
+  };
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Pending Leave Requests
+      <Typography variant="h4" gutterBottom>
+        Leave Management
       </Typography>
 
-      <TableContainer component={Paper} elevation={2} sx={{ mt: 3 }}>
-        <Table sx={{ minWidth: 650 }} aria-label="pending leave requests table">
-          <TableHead>
-            <TableRow sx={{ bgcolor: 'grey.100' }}>
-              <TableCell>Employee</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Address</TableCell>
-              <TableCell>Leave Type</TableCell>
-              <TableCell align="center">Start Date</TableCell>
-              <TableCell align="center">End Date</TableCell>
-              <TableCell align="center">Days</TableCell>
-              <TableCell align="center">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {leaveRequests.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
-                  <Typography color="text.secondary">
-                    No pending leave requests at the moment
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            ) : (
-              leaveRequests.map((request) => (
-                <TableRow key={request.id} hover>
-                  <TableCell>
-                    <strong>
-                      {request.firstName} {request.lastName}
-                    </strong>
-                  </TableCell>
-                  <TableCell>{request.email}</TableCell>
-                  <TableCell>{request.address}</TableCell>
-                  <TableCell>{request.leaveType}</TableCell>
-                  <TableCell align="center">{request.startDate}</TableCell>
-                  <TableCell align="center">{request.endDate}</TableCell>
-                  <TableCell align="center">
-                    <Box component="span" fontWeight="medium">
-                      {request.daysRequested}
-                    </Box>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Button
-                      variant="contained"
-                      color="success"
-                      size="small"
-                      onClick={() => handleAction(request.id, 'approved')}
-                      sx={{ mr: 1, minWidth: 92 }}
-                    >
-                      Approve
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="error"
-                      size="small"
-                      onClick={() => handleAction(request.id, 'declined')}
-                      sx={{ minWidth: 92 }}
-                    >
-                      Decline
-                    </Button>
-                  </TableCell>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+        <Tabs value={tabValue} onChange={handleTabChange}>
+          <Tab label="Pending Leave Requests" />
+          <Tab label="Manage Allowed Days" />
+        </Tabs>
+      </Box>
+
+      {/* ── TAB 1: Pending Requests ── */}
+      <TabPanel value={tabValue} index={0}>
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+            <CircularProgress />
+          </Box>
+        ) : error ? (
+          <Alert severity="error">{error}</Alert>
+        ) : requests.length === 0 ? (
+          <Typography color="text.secondary" align="center" sx={{ py: 4 }}>
+            No pending leave requests at the moment
+          </Typography>
+        ) : (
+          <TableContainer component={Paper} elevation={2}>
+            <Table>
+              <TableHead>
+                <TableRow sx={{ bgcolor: 'grey.100' }}>
+                  <TableCell>Employee ID</TableCell>
+                  <TableCell>Leave Type</TableCell>
+                  <TableCell align="center">Start Date</TableCell>
+                  <TableCell align="center">End Date</TableCell>
+                  <TableCell align="center">Days</TableCell>
+                  <TableCell align="center">Actions</TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+              </TableHead>
+              <TableBody>
+                {requests.map(req => (
+                  <TableRow key={req.id} hover>
+                    <TableCell>{req.employeeId}</TableCell>
+                    <TableCell>{req.leaveType}</TableCell>
+                    <TableCell align="center">{req.startDate}</TableCell>
+                    <TableCell align="center">{req.endDate}</TableCell>
+                    <TableCell align="center">{req.daysRequested}</TableCell>
+                    <TableCell align="center">
+                      <Button
+                        variant="contained"
+                        color="success"
+                        size="small"
+                        sx={{ mr: 1 }}
+                        onClick={() => handleAction(req.id, 'approved')}
+                        disabled={req.status !== 'pending'}
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="error"
+                        size="small"
+                        onClick={() => handleAction(req.id, 'declined')}
+                        disabled={req.status !== 'pending'}
+                      >
+                        Decline
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </TabPanel>
+
+      {/* ── TAB 2: Manage Allowed Days ── */}
+      <TabPanel value={tabValue} index={1}>
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+            <CircularProgress />
+          </Box>
+        ) : error ? (
+          <Alert severity="error">{error}</Alert>
+        ) : employees.length === 0 ? (
+          <Typography color="text.secondary" align="center" sx={{ py: 4 }}>
+            No employees found
+          </Typography>
+        ) : (
+          <TableContainer component={Paper} elevation={2}>
+            <Table>
+              <TableHead>
+                <TableRow sx={{ bgcolor: 'grey.100' }}>
+                  <TableCell>First Name</TableCell>
+                  <TableCell>Last Name</TableCell>
+                  <TableCell>Email</TableCell>
+                  <TableCell>Created At</TableCell>
+                  <TableCell align="center">Allowed Days</TableCell>
+                  <TableCell align="center">Action</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {employees.map(emp => (
+                  <TableRow key={emp.employeeId} hover>
+                    <TableCell>{emp.firstName}</TableCell>
+                    <TableCell>{emp.lastName}</TableCell>
+                    <TableCell>{emp.email}</TableCell>
+                    <TableCell>
+                      {emp.createdAt
+                        ? new Date(emp.createdAt).toLocaleDateString('en-GB')
+                        : 'N/A'}
+                    </TableCell>
+                    <TableCell align="center">
+                      <TextField
+                        type="number"
+                        size="small"
+                        value={emp.allowedDays ?? ''}
+                        onChange={e => handleDaysChange(emp.employeeId, e.target.value)}
+                        sx={{ width: 140 }}
+                        inputProps={{ min: 0 }}
+                      />
+                    </TableCell>
+                    <TableCell align="center">
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={() => handleSave(emp.employeeId)}
+                      >
+                        Save
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </TabPanel>
     </Container>
   );
 }
 
-export default LeaveRequestsPage;
+export default LeaveManagementPage;

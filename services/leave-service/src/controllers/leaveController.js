@@ -1,6 +1,7 @@
 import LeaveRequest from '../models/leave_request.js';
 import LeaveBalance from '../models/leave_balance.js';
-//import { Op } from 'sequelize';
+import axios from 'axios';
+
 
 // Helper to calculate days between dates (inclusive)
 const calculateDays = (start, end) => {
@@ -11,14 +12,91 @@ const calculateDays = (start, end) => {
   return diffDays;
 };
 
-// For development/demo phase - dummy employee data
-// In real implementation → call employee-service via HTTP/gRPC or use service discovery
-
 /**
- * @route   GET /getAllPending
- * @desc    Get all pending leave requests with employee basic info (HR/Admin view)
- * @access  Private (HR / Admin only)
+ * @route   GET /api/leave-balances
+ * @desc    Get all employees with their current leave balances
+ * @access  Private (HR/Admin only)
  */
+export const getEmployeesBalance = async (req, res) => {
+  try {
+    const authApiUrl = `${process.env.AUTH_SERVICE_URL}/users`; // adjust endpoint if needed
+
+    const authResponse = await axios.get(authApiUrl, {
+      params: { role: 'employee' }, // optional: filter only employees
+      headers: {
+        // If auth-service requires authorization
+        Authorization: req.headers.authorization, // forward the token
+        // or use a service-to-service token if needed
+      },
+    });
+
+    const employees = authResponse.data; // assuming array of users
+    if (!employees || employees.length === 0) {
+      return res.status(200).json([]);
+    }
+    console.log(employees)
+
+    //const currentYear = new Date().getFullYear();
+    const employeeIds = employees.users.map(emp => emp.id);
+    res.status(200).json(result);
+
+    //const balances = await LeaveBalance.findAll({
+    //  where: {
+    //    employee_id: employeeIds,
+    //    // year: currentYear,
+    //  },
+    //});
+    //console.log(balances);
+
+    // 4. Create lookup map for quick access
+    //const balanceMap = new Map();
+    //balances.forEach(balance => {
+    //  if (!balanceMap.has(balance.employee_id)) {
+    //    balanceMap.set(balance.employee_id, {});
+    //  }
+    //  balanceMap.get(balance.employee_id)[balance.leave_type] = balance.balance_days;
+    //});
+
+    //// 5. Combine employee data with their leave balances
+    //const result = employees.map(employee => {
+    //  const empBalances = balanceMap.get(employee.id) || {};
+
+    //  return {
+    //    employeeId: employee.id,
+    //    firstName: employee.firstName || 'Unknown',
+    //    lastName: employee.lastName || '',
+    //    email: employee.email || 'N/A',
+    //    // Add more fields if needed: department, position, etc.
+    //    balances: {
+    //      annual: empBalances['Annual'] || 0,
+    //      sick: empBalances['Sick'] || 0,
+    //      maternity: empBalances['Maternity'] || 0,
+    //      paternity: empBalances['Paternity'] || 0,
+    //      unpaid: empBalances['Unpaid'] || 0,
+    //      // Add other leave types your system supports
+    //    },
+    //  };
+    //});
+
+    //res.status(200).json(result);
+  } catch (error) {
+    console.error('Error fetching employees with balances:', error.message);
+
+    if (error.response) {
+      // Error from auth-service
+      return res.status(error.response.status).json({
+        message: 'Failed to fetch employee data from auth service',
+        error: error.response.data,
+      });
+    }
+
+    res.status(500).json({
+      message: 'Internal server error',
+      error: error.message,
+    });
+  }
+};
+
 export const getAllPendingLeaveRequests = async (req, res) => {
   try {
     const pendingRequests = await LeaveRequest.findAll({
@@ -77,15 +155,11 @@ export const getAllPendingLeaveRequests = async (req, res) => {
 
 };
 
-/**
- * @route   GET /api/leave-requests/pending
- * @desc    Get all pending leave requests (for HR/Admin)
- * @access  Private (HR / Admin only)
- */
 export const createLeaveRequest = async (req, res) => {
   try {
     const { leave_type, start_date, end_date } = req.body;
     const employee_id = req.user.id; // From authMiddleware
+    console.log(req.user);
 
     if (!leave_type || !start_date || !end_date) {
       return res.status(400).json({ message: 'Missing required fields' });
@@ -153,9 +227,6 @@ export const updateLeaveRequest = async (req, res) => {
     }
 
     if (request.status !== 'pending' && request.status !== 'rejected') {
-      // Allow updating rejected requests to "re-request" them, effectively resetting to pending
-      // But the user specifically asked for "re requesting again (for notifying)"
-      // If it's approved or cancelled, usually can't be changed easily without a new request or specific flow.
       return res.status(400).json({ message: 'Cannot update a request that is already processed (approved/cancelled)' });
     }
 
@@ -230,3 +301,4 @@ export const cancelLeaveRequest = async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 };
+

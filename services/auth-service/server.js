@@ -6,7 +6,7 @@ const sequelize = require('./src/config/db');
 const initializeDatabase = require('./src/config/initDb');
 const cors = require('cors');
 require('dotenv').config();
-const HOST = '127.0.0.1';
+const HOST = '0.0.0.0';
 
 
 const PORT = process.env.PORT || 3000;
