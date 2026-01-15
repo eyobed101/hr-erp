@@ -8,6 +8,6 @@ RUN npm ci
 
 COPY . .
 
-EXPOSE 3005
+EXPOSE 3004
 
 CMD ["node", "server.js"]
