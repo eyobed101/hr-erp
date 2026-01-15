@@ -6,6 +6,6 @@ const app = express();
 app.use(express.json());
 
 // Mount employee routes
-app.use('/employees', employeeRoutes);
+app.use('/api/employees', employeeRoutes);
 
 export default app;
