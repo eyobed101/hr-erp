@@ -86,8 +86,7 @@ const getTodayAttendance = async (req, res) => {
     const records = await Attendance.findAll({
       where: { clock_date: today },
     });
-
-    const updatedRecords = await Promise.all(
+  const updatedRecords = await Promise.all(
       records.map(async (att) => {
         if (att.clock_in && !att.clock_out) {
           const clockInTime = new Date(att.clock_in);
