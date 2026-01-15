@@ -12,6 +12,131 @@ const calculateDays = (start, end) => {
   return diffDays;
 };
 
+//import LeaveRequest from '../models/leave_request.js';
+//import { calculateDays } from '../utils/dateUtils.js'; // ← create this helper if not exists
+
+/**
+ * @route   POST /api/leave-requests
+ * @desc    Employee creates a new leave request
+ * @access  Private (authenticated employee only)
+ */
+
+//import LeaveRequest from '../models/leave_request.js';
+//import { calculateDays } from '../utils/dateUtils.js'; // your days calculator helper
+
+/**
+ * @route   POST /api/leave-requests
+ * @desc    Create a new leave request (validates token via auth service)
+ * @access  Private
+ */
+export const postLeaveRequest = async (req, res) => {
+  try {
+    // 1. Get token from Authorization header
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ message: 'Authorization header missing or invalid' });
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    // 2. Validate token by calling auth service
+    const authApiUrl = `${process.env.AUTH_SERVICE_URL}/validate`;
+
+    const authResponse = await axios.post(authApiUrl, {}, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    // 3. Extract user information from auth service response
+    // Adjust the field names according to what your auth service actually returns
+    const user = authResponse.data?.user || authResponse.data;
+    console.log(user);
+
+    if (!user || !user.id) {
+      return res.status(401).json({ message: 'Invalid or expired token - user not found' });
+    }
+
+    const employee_id = user.id;
+
+    // Optional: You can also validate role if needed
+    // if (user.role !== 'employee') {
+    //   return res.status(403).json({ message: 'Only employees can request leave' });
+    // }
+
+    // 4. Get request body
+    const { leave_type, start_date, end_date } = req.body;
+
+    // 5. Validation
+    if (!leave_type || !start_date || !end_date) {
+      return res.status(400).json({
+        message: 'Missing required fields: leave_type, start_date, end_date',
+      });
+    }
+
+    const validTypes = ['annual', 'sick', 'unpaid', 'maternity', 'other'];
+    const normalizedType = leave_type.toLowerCase();
+    if (!validTypes.includes(normalizedType)) {
+      return res.status(400).json({
+        message: `Invalid leave type. Allowed: ${validTypes.join(', ')}`,
+      });
+    }
+
+    // 6. Calculate days
+    const days_requested = calculateDays(start_date, end_date);
+    if (days_requested <= 0) {
+      return res.status(400).json({
+        message: 'End date must be after or equal to start date',
+      });
+    }
+
+    // 7. Create leave request
+    const newRequest = await LeaveRequest.create({
+      employee_id,
+      leave_type: normalizedType,
+      start_date,
+      end_date,
+      days_requested,
+      status: 'pending',
+      approver_id: null,
+    });
+
+    // 8. Success response
+    return res.status(201).json({
+      message: 'Leave request created successfully',
+      data: {
+        id: newRequest.id,
+        employee_id: newRequest.employee_id,
+        leave_type: newRequest.leave_type,
+        start_date: newRequest.start_date,
+        end_date: newRequest.end_date,
+        days_requested: newRequest.days_requested,
+        status: newRequest.status,
+        created_at: newRequest.created_at,
+      },
+    });
+
+  } catch (error) {
+    console.error('Error in postLeaveRequest:', error);
+
+    // Handle axios errors from auth service
+    if (error.response) {
+      const status = error.response.status;
+      const message = error.response.data?.message || 'Authentication service error';
+
+      if (status === 401 || status === 403) {
+        return res.status(status).json({ message: 'Invalid or expired token' });
+      }
+      return res.status(status).json({ message });
+    }
+
+    // Database or other errors
+    return res.status(500).json({
+      message: 'Failed to create leave request',
+      error: error.message,
+    });
+  }
+};
 /**
  * @route   GET /api/leave-balances
  * @desc    Get all employees with their current leave balances
