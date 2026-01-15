@@ -114,10 +114,21 @@ export const attendanceAPI = {
 };
 
 export const organizationAPI = {
-    getStructure: () => organizationService.get('orgStructure'),
-    getDepartments: () => organizationService.get('orgStructure/departments'), // Adjust if needed based on route
-    createDepartment: (data) => organizationService.post('orgStructure/departments', data),
-    updateDepartment: (id, data) => organizationService.put(`orgStructure/departments/${id}`, data),
+
+    getDepartments: () => organizationService.get('/organization/departments'),
+    createDepartment: (data) => organizationService.post('/organization/departments', data),
+    updateDepartment: (id, data) => organizationService.put(`/organization/departments/${id}`, data),
+    deleteDepartment: (id) => organizationService.delete(`/organization/departments/${id}`),
+};
+
+
+export const jobCategoryAPI = {
+
+    getJobCategories: () => organizationService.get('/organization/job-categories'),
+    getJobCategory: (id) => organizationService.get(`/organization/job-categories/${id}`),
+    createJobCategory: (data) => organizationService.post('/organization/job-categories', data),
+    updateJobCategory: (id, data) => organizationService.put(`/organization/job-categories/${id}`, data),
+    deleteJobCategory: (id) => organizationService.delete(`/organization/job-categories/${id}`),
 };
 
 export const trainingAPI = {

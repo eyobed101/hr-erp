@@ -34,6 +34,8 @@ import Profile from '../pages/common/Profile';
 import LeaveRequest from '../pages/employee/LeaveRequest';
 import Attendance from '../pages/employee/Attendance';
 import EmployeeCourses from '../pages/employee/EmployeeCourses';
+import DepartmentManagement from '../pages/organization/DepartmentManagement';
+import JobCategoryManagement from '../pages/organization/JobCategoryManagement';
 
 const AppRoutes = () => {
     const isAuthenticated = useSelector(selectIsAuthenticated);
@@ -46,6 +48,9 @@ const AppRoutes = () => {
 
     return (
         <Routes>
+
+
+
             <Route path="/login" element={<Login />} />
             <Route path="/jobs" element={<JobBoard />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
@@ -81,6 +86,12 @@ const AppRoutes = () => {
                 <Route path="/employee/leave" element={<RoleBasedRoute allowedRoles={[ROLES.EMPLOYEE]}><LeaveRequest /></RoleBasedRoute>} />
                 <Route path="/employee/attendance" element={<RoleBasedRoute allowedRoles={[ROLES.EMPLOYEE]}><Attendance /></RoleBasedRoute>} />
                 <Route path="/employee/courses" element={<RoleBasedRoute allowedRoles={[ROLES.EMPLOYEE]}><EmployeeCourses /></RoleBasedRoute>} />
+
+
+
+                {/* NEW ORGANIZATION ROUTES */}
+                <Route path="/admin/departments" element={<RoleBasedRoute allowedRoles={[ROLES.ADMIN]}><DepartmentManagement /></RoleBasedRoute>} />
+                <Route path="/admin/job-categories" element={<RoleBasedRoute allowedRoles={[ROLES.ADMIN]}><JobCategoryManagement /></RoleBasedRoute>} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
