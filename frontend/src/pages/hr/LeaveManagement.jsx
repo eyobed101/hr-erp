@@ -14,10 +14,9 @@ import {
   Alert,
   Box,
 } from '@mui/material';
-import axios from 'axios';
+import { leaveAPI } from '../../services/api';
 
-// Change this to your real API base URL
-const API_BASE_URL = 'http://localhost:8090'; // ← adjust according to your setup
+
 
 function LeaveRequestsPage() {
   const [leaveRequests, setLeaveRequests] = useState([]);
@@ -30,14 +29,7 @@ function LeaveRequestsPage() {
         setLoading(true);
         setError(null);
 
-        const request_url = `${API_BASE_URL}/getAllPending`;
-        console.log(request_url);
-        const response = await axios.get(request_url, {
-          headers: {
-            // Add authorization header if needed
-            // Authorization: `Bearer ${yourToken}`,
-          },
-        });
+        const response = await leaveAPI.getLeaves();
 
         // The backend now returns raw LeaveRequest objects
         // We need to format dates and add placeholder employee data

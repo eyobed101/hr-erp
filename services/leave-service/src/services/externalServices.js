@@ -5,7 +5,7 @@ const EMPLOYEE_SERVICE_URL = process.env.EMPLOYEE_SERVICE_URL || 'http://localho
 
 export const verifyToken = async (token) => {
     try {
-        const response = await apiClient.post(`${AUTH_SERVICE_URL}/verify`, {}, {
+        const response = await apiClient.post(`${AUTH_SERVICE_URL}/validate`, {}, {
             headers: {
                 Authorization: `Bearer ${token}`
             }

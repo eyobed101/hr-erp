@@ -13,9 +13,9 @@ const HOST = process.env.HOST || "localhost";
 
 app.use(express.json());
 app.use(cors());
-app.use(leaveRoutes);
+app.use('/api/leave', leaveRoutes);
 
-app.get("/", (_req, res)=>{
+app.get("/", (_req, res) => {
   res.send({ message: 'leave service is running' });
 })
 

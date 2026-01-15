@@ -7,7 +7,7 @@ const createServiceInstance = (serviceName) => {
         auth: 3000,
         employee: 3001,
         recruitment: 3002,
-        leave: 3004,
+        leave: 3003,
         attendance: 3005,
         organization: 3006,
         training: 3007,
@@ -100,6 +100,7 @@ export const recruitmentAPI = {
 
 export const leaveAPI = {
     getLeaves: (params) => leaveService.get('leave', { params }),
+    getMyLeaves: () => leaveService.get('leave/my'),
     getLeave: (id) => leaveService.get(`leave/${id}`),
     createLeave: (data) => leaveService.post('leave', data),
     approveLeave: (id) => leaveService.put(`leave/${id}/approve`),
