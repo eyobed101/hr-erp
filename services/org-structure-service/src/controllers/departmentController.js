@@ -168,3 +168,27 @@ exports.getDepartments = async (req, res) => {
     }
 };
 
+
+// Get a single department by ID
+exports.getDepartmentById = async (req, res) => {
+    try {
+        const deptId = req.params.id;
+
+        const department = await Department.findByPk(deptId, {
+            include: [{
+                model: Department,
+                as: 'parentDepartment',
+                attributes: ['id', 'departmentName']
+            }]
+        });
+
+        if (!department) {
+            return res.status(404).json({ error: 'Department not found' });
+        }
+
+        res.json(department);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+

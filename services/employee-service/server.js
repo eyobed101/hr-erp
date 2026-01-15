@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(
   '/employees',
   createProxyMiddleware({
-    target: 'http://localhost:5002', // Employee service
+    target: 'http://localhost:3002', // Employee service
     changeOrigin: true,
     pathRewrite: { '^/employees': '/api/employees' }, // maps /employees → /api/employees
   })
@@ -27,7 +27,7 @@ app.use(
 app.use(
   '/auth',
   createProxyMiddleware({
-    target: 'http://localhost:5001', // Auth service port
+    target: 'http://localhost:3001', // Auth service port
     changeOrigin: true,
     pathRewrite: { '^/auth': '/api/auth' },
   })
