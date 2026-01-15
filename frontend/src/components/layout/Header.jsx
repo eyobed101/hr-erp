@@ -17,6 +17,23 @@ const Header = ({ onMenuClick }) => {
                 </svg>
             </button>
 
+            {/* Branding - Added for uniformity */}
+            <div className="hidden lg:flex items-center gap-3 mr-8">
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-100">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <div className="flex flex-col leading-none">
+                    <span className="text-sm font-extrabold tracking-tight uppercase text-gray-900">
+                        INNOVATION <span className="text-blue-500">&</span> SERVICE
+                    </span>
+                    <span className="text-[8px] font-black uppercase tracking-[0.2em] text-gray-400">
+                        HR Management
+                    </span>
+                </div>
+            </div>
+
             {/* Search Bar - Hidden on mobile */}
             <div className="hidden md:flex items-center gap-4 flex-1 max-w-xl">
                 <div className="relative flex-1">

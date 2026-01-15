@@ -8,6 +8,7 @@ import RoleBasedRoute from './RoleBasedRoute';
 import MainLayout from '../components/layout/MainLayout';
 
 import Login from '../pages/common/Login';
+import LandingPage from '../pages/common/LandingPage';
 import JobBoard from '../pages/common/JobBoard';
 import NotFound from '../pages/common/NotFound';
 import Unauthorized from '../pages/common/Unauthorized';
@@ -49,7 +50,7 @@ const AppRoutes = () => {
             <Route path="/jobs" element={<JobBoard />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
 
-            <Route path="/" element={<Navigate to={getDefaultRoute()} replace />} />
+            <Route path="/" element={<LandingPage />} />
 
             <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
                 <Route path="/admin" element={<RoleBasedRoute allowedRoles={[ROLES.ADMIN]}><Navigate to="/admin/dashboard" /></RoleBasedRoute>} />
