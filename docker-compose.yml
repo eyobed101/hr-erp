@@ -7,11 +7,12 @@ services:
     container_name: hr-erp-mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_password}
-      MYSQL_DATABASE: hr_erp
+      MYSQL_DATABASE: hr_erp # Default DB, others created by init.sql
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - "3307:3306"  # Changed to 3307 to avoid conflict with local MySQL
+      - "3307:3306"  # Expose on 3307 to avoid conflict with local MySQL
     networks:
       - hr-erp-network
     healthcheck:
@@ -26,13 +27,11 @@ services:
       context: ./services/auth-service
       dockerfile: Dockerfile
     container_name: hr-erp-auth
+    env_file:
+      - ./services/auth-service/.env
     environment:
       - DB_HOST=mysql
-      - DB_USER=root
-      - DB_PASSWORD=${DB_ROOT_PASSWORD:-root_password}
-      - DB_NAME=hr_erp
-      - JWT_SECRET=${JWT_SECRET:-your_jwt_secret_change_in_production}
-      - PORT=3000
+      - DB_PORT=3306
     ports:
       - "3000:3000"
     depends_on:
@@ -48,15 +47,13 @@ services:
       context: ./services/recruitment-service
       dockerfile: Dockerfile
     container_name: hr-erp-recruitment
+    env_file:
+      - ./services/recruitment-service/.env
     environment:
       - DB_HOST=mysql
-      - DB_USER=root
-      - DB_PASSWORD=${DB_ROOT_PASSWORD:-root_password}
-      - DB_NAME=hr_erp
-      - JWT_SECRET=${JWT_SECRET:-your_jwt_secret_change_in_production}
-      - PORT=3002
+      - DB_PORT=3306
     ports:
-      - "3002:3002"
+      - "3001:3001"
     depends_on:
       mysql:
         condition: service_healthy
