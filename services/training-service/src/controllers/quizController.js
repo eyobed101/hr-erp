@@ -34,6 +34,14 @@ exports.submitQuizAttempt = async (req, res) => {
         const { answers } = req.body;
         const user_id = req.user.id;
 
+        console.log(`[QuizSubmission] Received attempt for quiz ${quizId} from user ${user_id}`);
+        console.log(`[QuizSubmission] Answers:`, JSON.stringify(answers));
+
+        if (!answers) {
+            console.error(`[QuizSubmission] Error: No answers provided in request body`);
+            return res.status(400).json({ message: 'No answers provided' });
+        }
+
         const quiz = await Quiz.findByPk(quizId, {
             include: [
                 { model: Question, as: 'questions' },
@@ -58,7 +66,7 @@ exports.submitQuizAttempt = async (req, res) => {
 
         // Helper to convert option_a format to A format
         const normalizeAnswer = (answer) => {
-            if (!answer) return null;
+            if (!answer || typeof answer !== 'string') return null;
             // If answer is already in A/B/C/D format, return as is
             if (['A', 'B', 'C', 'D'].includes(answer.toUpperCase())) {
                 return answer.toUpperCase();
@@ -71,14 +79,16 @@ exports.submitQuizAttempt = async (req, res) => {
             return null;
         };
 
-        quiz.questions.forEach(question => {
-            const userAnswer = normalizeAnswer(answers[question.id]);
-            const correctAnswer = question.correct_answer;
+        if (quiz.questions && Array.isArray(quiz.questions)) {
+            quiz.questions.forEach(question => {
+                const userAnswer = normalizeAnswer(answers[question.id]);
+                const correctAnswer = question.correct_answer;
 
-            if (userAnswer === correctAnswer) {
-                correctAnswers++;
-            }
-        });
+                if (userAnswer === correctAnswer) {
+                    correctAnswers++;
+                }
+            });
+        }
 
         const score = Math.round((correctAnswers / totalQuestions) * 100);
         const passed = score >= quiz.course.passing_score;

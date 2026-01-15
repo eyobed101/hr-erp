@@ -45,7 +45,7 @@ const AppRoutes = () => {
         if (!isAuthenticated) return '/login';
         return `${ROLE_ROUTES[role]}/dashboard`;
     };
-                
+
 
     return (
         <Routes>
@@ -71,6 +71,7 @@ const AppRoutes = () => {
                 <Route path="/hr/dashboard" element={<RoleBasedRoute allowedRoles={[ROLES.HR]}><HRDashboard /></RoleBasedRoute>} />
                 <Route path="/hr/profile" element={<RoleBasedRoute allowedRoles={[ROLES.HR]}><Profile /></RoleBasedRoute>} />
                 <Route path="/hr/employees" element={<RoleBasedRoute allowedRoles={[ROLES.HR]}><Employees /></RoleBasedRoute>} />
+                <Route path="/hr/training" element={<RoleBasedRoute allowedRoles={[ROLES.HR]}><TrainingManagement /></RoleBasedRoute>} />
                 <Route path="/hr/recruitment" element={<RoleBasedRoute allowedRoles={[ROLES.HR]}><Recruitment /></RoleBasedRoute>} />
                 <Route path="/hr/leave" element={<RoleBasedRoute allowedRoles={[ROLES.HR]}><LeaveManagement /></RoleBasedRoute>} />
 
