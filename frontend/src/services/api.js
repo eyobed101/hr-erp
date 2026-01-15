@@ -75,11 +75,17 @@ export const profileAPI = {
 };
 
 export const employeeAPI = {
-    getEmployees: () => employeeService.get('employee'),
-    getEmployee: (id) => employeeService.get(`employee/${id}`),
-    createEmployee: (data) => employeeService.post('employee', data),
-    updateEmployee: (id, data) => employeeService.put(`employee/${id}`, data),
-    deleteEmployee: (id) => employeeService.delete(`employee/${id}`),
+    getEmployees: () => employeeService.get('employees'),
+    getEmployee: (id) => employeeService.get(`employees/${id}`),
+    createEmployee: (data) => employeeService.post('employees', data),
+    updateEmployee: (id, data) => employeeService.put(`employees/${id}`, data),
+    deleteEmployee: (id) => employeeService.delete(`employees/${id}`),
+
+    // Positions
+    getPositions: () => employeeService.get('positions'),
+    createPosition: (data) => employeeService.post('positions', data),
+    updatePosition: (id, data) => employeeService.put(`positions/${id}`, data),
+    deletePosition: (id) => employeeService.delete(`positions/${id}`),
 };
 
 export const recruitmentAPI = {
@@ -115,20 +121,20 @@ export const attendanceAPI = {
 
 export const organizationAPI = {
 
-    getDepartments: () => organizationService.get('/organization/departments'),
-    createDepartment: (data) => organizationService.post('/organization/departments', data),
-    updateDepartment: (id, data) => organizationService.put(`/organization/departments/${id}`, data),
-    deleteDepartment: (id) => organizationService.delete(`/organization/departments/${id}`),
+    getDepartments: () => organizationService.get('organization/departments'),
+    createDepartment: (data) => organizationService.post('organization/departments', data),
+    updateDepartment: (id, data) => organizationService.put(`organization/departments/${id}`, data),
+    deleteDepartment: (id) => organizationService.delete(`organization/departments/${id}`),
 };
 
 
 export const jobCategoryAPI = {
 
-    getJobCategories: () => organizationService.get('/organization/job-categories'),
-    getJobCategory: (id) => organizationService.get(`/organization/job-categories/${id}`),
-    createJobCategory: (data) => organizationService.post('/organization/job-categories', data),
-    updateJobCategory: (id, data) => organizationService.put(`/organization/job-categories/${id}`, data),
-    deleteJobCategory: (id) => organizationService.delete(`/organization/job-categories/${id}`),
+    getJobCategories: () => organizationService.get('organization/job-categories'),
+    getJobCategory: (id) => organizationService.get(`organization/job-categories/${id}`),
+    createJobCategory: (data) => organizationService.post('organization/job-categories', data),
+    updateJobCategory: (id, data) => organizationService.put(`organization/job-categories/${id}`, data),
+    deleteJobCategory: (id) => organizationService.delete(`organization/job-categories/${id}`),
 };
 
 export const trainingAPI = {

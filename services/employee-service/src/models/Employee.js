@@ -7,9 +7,9 @@ const Employee = sequelize.define('Employee', {
   user_id: { type: DataTypes.INTEGER, allowNull: false },
   employee_code: { type: DataTypes.STRING, allowNull: false },
   hire_date: { type: DataTypes.DATE, allowNull: false },
-  department_id: { type: DataTypes.INTEGER, allowNull: false },
-  position_id: { type: DataTypes.INTEGER, allowNull: false },
-  manager_id: { type: DataTypes.INTEGER },
+  department_id: { type: DataTypes.INTEGER, allowNull: true },
+  position_id: { type: DataTypes.INTEGER, allowNull: true },
+  manager_id: { type: DataTypes.INTEGER, allowNull: true },
   created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
   updated_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
 }, {
